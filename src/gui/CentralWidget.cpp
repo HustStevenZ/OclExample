@@ -3,6 +3,7 @@
 //
 
 #include "CentralWidget.h"
+#include "ImageWidget.h"
 #include <QWidget>
 #include <QOpenGLWidget>
 
@@ -10,34 +11,57 @@ CentralWidget::CentralWidget() {
     setWindowTitle(tr("OpenCL Examples"));
 
     setFixedSize(820,500);
-//    menuBar()->addMenu("open");
-    QWidget *before = new QWidget(this);
-    QWidget *after = new QWidget(this);
+    ImageWidget *before = new ImageWidget(this);
+    ImageWidget *oclFiltered = new ImageWidget(this);
+    beforeW=before;
+    afterW=oclFiltered;
     QLabel *beforeLabel = new QLabel(tr("Before"));
     beforeLabel->setAlignment(Qt::AlignHCenter);
-    QLabel *afterLabel = new QLabel(tr("After"));
+    QLabel *afterLabel = new QLabel(tr("Ocl"));
     afterLabel->setAlignment(Qt::AlignHCenter);
 
-    QMenuBar *menuBar = new QMenuBar(this);
-    menuBar->setVisible(true);
-    menuBar->addMenu("open");
-//    menuBar->setFixedSize(820,20);
-    menuBar->setEnabled(true);
-    menuBar->setNativeMenuBar(false);
-//    menuBar->set
+    createMenu();
 
     before->setFixedSize(400,400);
-    after->setFixedSize(400,400);
+    oclFiltered->setFixedSize(400,400);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
-    mainLayout->addWidget(menuBar);
-    mainLayout->setMenuBar(menuBar);
+    mainLayout->addWidget(this->menuBar);
+    mainLayout->setMenuBar(this->menuBar);
     QGridLayout *layout = new QGridLayout;
 //    layout->addWidget(menubar,0,0);
     layout->addWidget(before, 0, 0);
-    layout->addWidget(after, 0, 1);
+    layout->addWidget(oclFiltered, 0, 1);
     layout->addWidget(beforeLabel, 1, 0);
     layout->addWidget(afterLabel, 1, 1);
     mainLayout->addLayout(layout);
 
 }
+
+void CentralWidget::createMenu()
+{
+
+   menuBar = new QMenuBar(this);
+    menuBar->setVisible(true);
+    QMenu *fileMenu = menuBar->addMenu(tr("&File"));
+//    menuBar->setFixedSize(820,20);
+    menuBar->setEnabled(true);
+    menuBar->setNativeMenuBar(false);//Try to bypass the mac os display menu problem
+    QAction *openAction = new QAction(tr("&Open"),fileMenu);
+    fileMenu->addAction(openAction);
+    connect(openAction,&QAction::triggered,this,&CentralWidget::open);
+
+}
+
+void CentralWidget::open() {
+    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QStandardPaths::locate(QStandardPaths::StandardLocation::HomeLocation,"."),"Image files (*.png *.jpg *.jpeg)");
+    if(!isFileValid())
+        this->objPath="";
+    if(isFileValid())
+    {
+        beforeW->setImage(new QImage(objPath));
+        beforeW->repaint(); //call repaint event so that the widget redraws
+    }
+}
+
+
