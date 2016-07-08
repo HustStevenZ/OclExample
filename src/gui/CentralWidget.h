@@ -17,6 +17,7 @@ public:
 
 private:
     void createMenu();
+    void processImages();
     bool isFileValid(){ return  !objPath.isEmpty()&&(objPath.endsWith(".jpg")
                                                      || objPath.endsWith(".png")
                                                      || objPath.endsWith(".jpeg"));};

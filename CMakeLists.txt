@@ -27,7 +27,7 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 # Add compiler flags for building executables (-fPIE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 #link_libraries(Qt5::Widgets)
-set(SOURCE_FILES src/gui/CentralWidget.cpp src/gui/CentralWidget.h src/OclExample.cpp src/misc/Meshloader.cpp src/misc/Meshloader.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h)
+set(SOURCE_FILES src/gui/CentralWidget.cpp src/gui/CentralWidget.h src/OclExample.cpp src/misc/Meshloader.cpp src/misc/Meshloader.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/ocl/OclImage.cpp src/ocl/OclImage.h src/ocl/OclBuffer.cpp src/ocl/OclBuffer.h src/ocl/OclProgram.cpp src/ocl/OclProgram.h src/ocl/OclKernel.cpp src/ocl/OclKernel.h src/ocl/OclCommandQueue.cpp src/ocl/OclCommandQueue.h src/ocl/OclDevice.cpp src/ocl/OclDevice.h src/ocl/OclSampler.cpp src/ocl/OclSampler.h src/ocl/OclEvent.cpp src/ocl/OclEvent.h src/ocl/OclEngine.cpp src/ocl/OclEngine.h)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader)
 SET(OBLLOADER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/src)

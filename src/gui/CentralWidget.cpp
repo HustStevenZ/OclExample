@@ -59,9 +59,16 @@ void CentralWidget::open() {
         this->objPath="";
     if(isFileValid())
     {
-        beforeW->setImage(new QImage(objPath));
+        QImage* image = new QImage(objPath);
+        beforeW->setFixedSize(400,image->height()*400/image->width());
+        beforeW->setImage(image);
         beforeW->repaint(); //call repaint event so that the widget redraws
     }
 }
 
+void CentralWidget::processImages() {
+    if(isFileValid())
+    {
 
+    }
+}
