@@ -10,6 +10,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+#####################################################################
+###           QT Dependencies                                     ###
+#####################################################################
+
 find_package(Qt5Widgets)
 find_package(Qt5Core)
 find_package(Qt5Gui)
@@ -27,7 +31,11 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 # Add compiler flags for building executables (-fPIE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 #link_libraries(Qt5::Widgets)
-set(SOURCE_FILES src/gui/CentralWidget.cpp src/gui/CentralWidget.h src/OclExample.cpp src/misc/Meshloader.cpp src/misc/Meshloader.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/ocl/OclImage.cpp src/ocl/OclImage.h src/ocl/OclBuffer.cpp src/ocl/OclBuffer.h src/ocl/OclProgram.cpp src/ocl/OclProgram.h src/ocl/OclKernel.cpp src/ocl/OclKernel.h src/ocl/OclCommandQueue.cpp src/ocl/OclCommandQueue.h src/ocl/OclDevice.cpp src/ocl/OclDevice.h src/ocl/OclSampler.cpp src/ocl/OclSampler.h src/ocl/OclEvent.cpp src/ocl/OclEvent.h src/ocl/OclEngine.cpp src/ocl/OclEngine.h)
+set(SOURCE_FILES src/gui/CentralWidget.cpp src/gui/CentralWidget.h src/OclExample.cpp src/misc/Meshloader.cpp src/misc/Meshloader.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/ocl/OclImage.cpp src/ocl/OclImage.h src/ocl/OclBuffer.cpp src/ocl/OclBuffer.h src/ocl/OclProgram.cpp src/ocl/OclProgram.h src/ocl/OclKernel.cpp src/ocl/OclKernel.h src/ocl/OclCommandQueue.cpp src/ocl/OclCommandQueue.h src/ocl/OclContext.cpp src/ocl/OclContext.h src/ocl/OclSampler.cpp src/ocl/OclSampler.h src/ocl/OclEvent.cpp src/ocl/OclEvent.h src/ocl/OclEngine.cpp src/ocl/OclEngine.h src/ocl/OclHeader.h src/ocl/OclErrors.cpp src/ocl/OclErrors.h src/imageFilters/ImageFilter.cpp src/imageFilters/ImageFilter.h src/common/Image.cpp src/common/Image.h)
+
+#####################################################################
+###           objloader Dependencies                             ###
+#####################################################################
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader)
 SET(OBLLOADER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/src)
@@ -36,6 +44,33 @@ SET(OBJLOADER_LIBARIES objloader)
 
 include_directories(${OBLLOADER_INCLUDE_DIR})
 link_directories(${OBLLOADER_LIBRARY_DIR})
+
+
+#####################################################################
+###           OpenCL
+#####################################################################
+find_package(OpenCL REQUIRED)
+if (OpenCL_FOUND)
+    include_directories(${OpenCL_INCLUDE_DIRS})
+    link_directories(${OpenCL_LIBRARIES})
+    link_libraries(${OpenCL_LIBRARIES})
+elseif(NOT OpenCL_FOUND)
+    message("OpenCL is not installed!")
+endif()
+
+
+#####################################################################
+###           OpenGL
+#####################################################################
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIRS})
+link_directories(${OpenGL_LIBRARY_DIRS})
+add_definitions(${OpenGL_DEFINITIONS})
+link_libraries(${OPENGL_LIBRARIES})
+if(NOT OPENGL_FOUND)
+    message(ERROR " OPENGL not found!")
+endif(NOT OPENGL_FOUND)
+
 add_executable(OclExample ${SOURCE_FILES})
 target_link_libraries(OclExample Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(OclExample objloader)

@@ -7,6 +7,7 @@
 
 #include <QtWidgets>
 #include <src/misc/Meshloader.h>
+#include <src/ImageFilters/ImageFilter.h>
 #include "ImageWidget.h"
 
 class CentralWidget: public QWidget {
@@ -28,13 +29,17 @@ private slots:
 private:
 
 
+    //Gui Data
     QMenuBar* menuBar;
     QString objPath = "";
     ImageWidget* beforeW;
     ImageWidget* afterW;
 
+    //OGL Data
     Meshloader* loader = new Meshloader();
 
+    //Image Filter
+    ImageFilter* imageFilter = new ImageFilter();
 
 };
 
