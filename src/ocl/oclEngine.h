@@ -15,15 +15,21 @@
 
 //Max number of computer units
 #define OCL_DEVICE_MAX_DEVICE_NUM 128
-class std::vector;
+
 class OclEngine {
 
 public:
 
-    OclEngine();
+    static OclEngine* getEngine()
+    {
 
-    OclContext* createContext(OclContext::ContextProperties contextProperties);
-    bool releaseContext(OclContext* context);
+        if(_oclEngine == nullptr)
+        {
+            _oclEngine = new OclEngine();
+        }
+        return _oclEngine;
+    }
+
     ~OclEngine(){
 
         if(_contexts.size()>0)
@@ -42,19 +48,21 @@ public:
         }
     }
 
+    OclContext* createContext();
+
+    bool releaseContext(OclContext* context);
+
+
 private:
+    OclEngine();
     void init();
 
     bool isPlatformValid(){ return _platformInfo!= nullptr && _platformInfo->num_platforms>0;}
+    OclContext* createContext(OclContext::ContextProperties contextProperties);
 
 private:
 
-    struct Platforms{
-//        cl_platform_id platforms[OCL_ENGINE_MAX_PLATFORM_ENTRIES];
-        PlatformInfo platforms[OCL_ENGINE_MAX_PLATFORM_ENTRIES];
-        cl_uint num_platforms;
-    };
-
+    static OclEngine* _oclEngine;
 
     struct PlatformInfo{
         cl_platform_id platform_id;
@@ -64,6 +72,13 @@ private:
         cl_uint num_devices;
     };
 
+    struct Platforms{
+//        cl_platform_id platforms[OCL_ENGINE_MAX_PLATFORM_ENTRIES];
+        PlatformInfo platforms[OCL_ENGINE_MAX_PLATFORM_ENTRIES];
+        cl_uint num_platforms;
+    };
+
+
 
     Platforms* _platformInfo = nullptr;
     std::vector<OclContext*> _contexts;
@@ -72,6 +87,5 @@ private:
 
     PlatformInfo *getDefaultPlatform();
 };
-
 
 #endif //OCLEXAMPLE_OCLENGINE_H

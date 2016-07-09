@@ -97,9 +97,23 @@ OclContext* OclEngine::createContext(OclContext::ContextProperties contextProper
         return nullptr;
 }
 
-PlatformInfo *OclEngine::getDefaultPlatform() {
+OclEngine::PlatformInfo* OclEngine::getDefaultPlatform() {
     if(!isPlatformValid())
     return nullptr;
-    return _platformInfo->num_platforms>0?_platformInfo->platforms[0]: nullptr;
+    return _platformInfo->num_platforms>0?_platformInfo->platforms+0: nullptr;
 }
+
+bool OclEngine::releaseContext(OclContext *context) {
+    std::vector<OclContext*>::iterator it = std::find(_contexts.begin(),_contexts.end(),context);
+    if(it!=_contexts.end()) {
+        _contexts.erase(it);
+        return true;
+    }
+    return false;
+}
+OclContext* OclEngine::createContext() {
+    return createContext({getDefaultPlatform()->platform_id,false});
+}
+
+OclEngine* OclEngine::_oclEngine = nullptr;
 

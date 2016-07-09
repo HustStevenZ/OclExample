@@ -19,7 +19,7 @@ public:
      */
     void filterImage(QImage* image);
 private:
-    OclEngine* oclEngine = new OclEngine();
+    OclContext* _context = OclEngine::getEngine()->createContext();
 
 
 };
