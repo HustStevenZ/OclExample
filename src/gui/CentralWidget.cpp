@@ -54,7 +54,8 @@ void CentralWidget::createMenu()
 }
 
 void CentralWidget::open() {
-    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QStandardPaths::locate(QStandardPaths::StandardLocation::HomeLocation,"."),"Image files (*.png *.jpg *.jpeg)");
+    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
+
     if(!isFileValid())
         this->objPath="";
     if(isFileValid())
@@ -63,12 +64,13 @@ void CentralWidget::open() {
         beforeW->setFixedSize(400,image->height()*400/image->width());
         beforeW->setImage(image);
         beforeW->repaint(); //call repaint event so that the widget redraws
+        processImages();
     }
 }
 
 void CentralWidget::processImages() {
     if(isFileValid())
     {
-
+        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
     }
 }

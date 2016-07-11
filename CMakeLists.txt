@@ -71,6 +71,7 @@ if(NOT OPENGL_FOUND)
     message(ERROR " OPENGL not found!")
 endif(NOT OPENGL_FOUND)
 
+add_definitions("-DDEBUG")
 add_executable(OclExample ${SOURCE_FILES})
 target_link_libraries(OclExample Qt5::Widgets Qt5::Core Qt5::Gui)
 target_link_libraries(OclExample objloader)

@@ -18,6 +18,8 @@ public:
      * TODO: Perhaps we may have time to isolate ImageFilter from QImage in the future
      */
     void filterImage(QImage* image);
+
+    std::string testHelloWorld();
 private:
     OclContext* _context = OclEngine::getEngine()->createContext();
 

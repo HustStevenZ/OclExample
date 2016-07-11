@@ -59,10 +59,10 @@ OclContext* OclEngine::createContext(OclContext::ContextProperties contextProper
     CGLShareGroupObj  kCGLShareGroup  = CGLGetShareGroup(kCGLContext);
 
     cl_context_properties properties[] = {
-            CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
-            (cl_context_properties) kCGLShareGroup,
+//            CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
+//            (cl_context_properties) kCGLShareGroup,
             CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
-            CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
+//            CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
             0
     };
 
@@ -107,6 +107,7 @@ bool OclEngine::releaseContext(OclContext *context) {
     std::vector<OclContext*>::iterator it = std::find(_contexts.begin(),_contexts.end(),context);
     if(it!=_contexts.end()) {
         _contexts.erase(it);
+        delete context;
         return true;
     }
     return false;
