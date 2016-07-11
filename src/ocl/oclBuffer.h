@@ -20,7 +20,7 @@ public:
         //       ,CL_MEM_HOST_READ_ONLY,CL_MEM_HOST_NO_ACCESS
     };
 
-public:
+
     OclBuffer(cl_mem buffer){
         _buffer=buffer;
     };
@@ -35,8 +35,8 @@ public:
     }
 
     static unsigned long translateBufferModeToFlags(BufferMode mode);
-    
-private:
+
+protected:
     cl_mem _buffer;
 
 };

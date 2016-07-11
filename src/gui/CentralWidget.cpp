@@ -71,6 +71,11 @@ void CentralWidget::open() {
 void CentralWidget::processImages() {
     if(isFileValid())
     {
-        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
+//        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
+        QImage* image = imageFilter->filterImage(new QImage(objPath));
+
+        afterW->setFixedSize(400,image->height()*400/image->width());
+        afterW->setImage(image);
+        afterW->repaint();
     }
 }

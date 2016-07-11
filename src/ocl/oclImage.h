@@ -6,7 +6,12 @@
 #define OCLEXAMPLE_OCLIMAGE_H
 
 
-class oclImage {
+#include "OclBuffer.h"
+
+class OclImage: public OclBuffer {
+public:
+    OclImage(cl_mem imageObj):OclBuffer(imageObj){};
+
 
 };
 

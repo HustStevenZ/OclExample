@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(OclExample)
-
+include(cmake_clean.cmake)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -31,7 +31,41 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 # Add compiler flags for building executables (-fPIE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 #link_libraries(Qt5::Widgets)
-set(SOURCE_FILES src/gui/CentralWidget.cpp src/gui/CentralWidget.h src/OclExample.cpp src/misc/Meshloader.cpp src/misc/Meshloader.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/gui/ImageWidget.cpp src/gui/ImageWidget.h src/ocl/OclImage.cpp src/ocl/OclImage.h src/ocl/OclBuffer.cpp src/ocl/OclBuffer.h src/ocl/OclProgram.cpp src/ocl/OclProgram.h src/ocl/OclKernel.cpp src/ocl/OclKernel.h src/ocl/OclCommandQueue.cpp src/ocl/OclCommandQueue.h src/ocl/OclContext.cpp src/ocl/OclContext.h src/ocl/OclSampler.cpp src/ocl/OclSampler.h src/ocl/OclEvent.cpp src/ocl/OclEvent.h src/ocl/OclEngine.cpp src/ocl/OclEngine.h src/ocl/OclHeader.h src/ocl/OclErrors.cpp src/ocl/OclErrors.h src/imageFilters/ImageFilter.cpp src/imageFilters/ImageFilter.h src/common/Image.cpp src/common/Image.h)
+set(SOURCE_FILES
+        src/gui/CentralWidget.cpp
+        src/gui/CentralWidget.h
+        src/OclExample.cpp
+        src/io/Meshloader.cpp
+        src/io/Meshloader.h
+        src/gui/ImageWidget.cpp
+        src/gui/ImageWidget.h
+        src/ocl/OclImage.cpp
+        src/ocl/OclImage.h
+        src/ocl/OclBuffer.cpp
+        src/ocl/OclBuffer.h
+        src/ocl/OclProgram.cpp
+        src/ocl/OclProgram.h
+        src/ocl/OclKernel.cpp
+        src/ocl/OclKernel.h
+        src/ocl/OclCommandQueue.cpp
+        src/ocl/OclCommandQueue.h
+        src/ocl/OclContext.cpp
+        src/ocl/OclContext.h
+        src/ocl/OclSampler.cpp
+        src/ocl/OclSampler.h
+        src/ocl/OclEvent.cpp
+        src/ocl/OclEvent.h
+        src/ocl/OclEngine.cpp
+        src/ocl/OclEngine.h
+        src/ocl/OclHeader.h
+        src/ocl/OclErrors.cpp
+        src/ocl/OclErrors.h
+        src/imageFilters/ImageFilter.cpp
+        src/imageFilters/ImageFilter.h
+        src/common/Image.cpp
+        src/common/Image.h
+        src/io/clSource.cpp
+        src/io/clSource.h)
 
 #####################################################################
 ###           objloader Dependencies                             ###
@@ -70,6 +104,16 @@ link_libraries(${OPENGL_LIBRARIES})
 if(NOT OPENGL_FOUND)
     message(ERROR " OPENGL not found!")
 endif(NOT OPENGL_FOUND)
+
+
+#####################################################################
+###           Copy CL Source to deploy directory
+#####################################################################
+set(CL_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cl/)
+file(REMOVE_RECURSE ${CL_OUTPUT_DIR})
+file(REMOVE ${CL_OUTPUT_DIR}/imageFilters/programes/*.cl)
+file(COPY src/imageFilters/programes/ DESTINATION "${CL_OUTPUT_DIR}/imageFilters/programes/")
+
 
 add_definitions("-DDEBUG")
 add_executable(OclExample ${SOURCE_FILES})

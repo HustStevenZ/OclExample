@@ -25,6 +25,9 @@ void OclErrors::CheckError(cl_int erroCode, std::string errSource) {
             errMesg="CL_INVALID_PROGRAM_EXECUTABLE no successfully built program\n"\
                     "executable available!";
             break;
+        case CL_BUILD_PROGRAM_FAILURE:
+            errMesg="CL_BUILD_PROGRAM_FAILURE failed to build program\n";
+            break;
         case CL_INVALID_COMMAND_QUEUE:
             errMesg="CL_INVALID_COMMAND_QUEUE command_queue is not valid";
             break;

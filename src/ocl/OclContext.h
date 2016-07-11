@@ -9,6 +9,7 @@
 #include "OclHeader.h"
 #include "OclProgram.h"
 #include "OclBuffer.h"
+#include "OclImage.h"
 
 class OclEngine;
 
@@ -25,10 +26,19 @@ public:
     OclProgram* createProgramFromSource(std::string sourceStr);
 
     OclBuffer* createBuffer(int size,OclBuffer::BufferMode mode,char* host_ptr);
+    OclImage* createImage2D(OclBuffer::BufferMode mode,const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data);
+    OclImage* createImage3D(OclBuffer::BufferMode mode,const cl_image_format *format, size_t width, size_t height,
+                            size_t depth, size_t row_pitch, size_t slice_pitch, void *data);
 
-    void enqueueKernel(OclKernel* kernel,unsigned int work_dim,unsigned int work_offset,unsigned int work_size,unsigned int local_size);
+    void enqueueKernel(OclKernel* kernel,unsigned int work_dimension,size_t * work_offset,size_t * work_size,size_t * local_size);
 
     void enqueueReadBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char** hostMem);
+
+    void enqueueReadImage2D(OclImage* image, unsigned int reginx,
+                            unsigned int reginy,char* buffer,  unsigned int originx =0 , unsigned int originey=0,unsigned int row_pitch = 0);
+    void enqueueWriteImage2D(OclImage* image, unsigned int reginx,
+                             unsigned int reginy,char* buffer,  unsigned int originx =0 , unsigned int originey=0,unsigned int row_pitch = 0);
+    void enqueueWriteBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char** hostMem);
 
     void mapReadBuffer(OclBuffer*buffer,unsigned int size,char *hostMeme);
 

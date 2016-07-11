@@ -6,7 +6,7 @@
 #define OCLEXAMPLE_OCLEXAMPLEGUI_H
 
 #include <QtWidgets>
-#include <src/misc/Meshloader.h>
+#include <src/io/Meshloader.h>
 #include <src/ImageFilters/ImageFilter.h>
 #include "ImageWidget.h"
 

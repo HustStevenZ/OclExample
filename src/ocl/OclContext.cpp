@@ -60,10 +60,9 @@ OclBuffer* OclContext::createBuffer(int size, OclBuffer::BufferMode mode, char *
     return nullptr;
 }
 
-void OclContext::enqueueKernel(OclKernel *kernel, unsigned int work_dim, unsigned int work_offset, unsigned int work_size,
-                               unsigned int local_size) {
-    size_t size=work_size;
-    cl_int errCode = clEnqueueNDRangeKernel(_command_queue,kernel->getClKernel(),work_dim,NULL,&size,NULL,0,NULL,NULL);
+void OclContext::enqueueKernel(OclKernel *kernel,unsigned int work_dimension, size_t * work_offset, size_t * work_size,
+                               size_t * local_size) {
+    cl_int errCode = clEnqueueNDRangeKernel(_command_queue,kernel->getClKernel(),work_dimension,work_offset,work_size,local_size,0,NULL,NULL);
 
     OclErrors::CheckError(errCode,"OclContext::enqueueKernel");
 
@@ -74,6 +73,76 @@ void OclContext::enqueueReadBuffer(OclBuffer *buffer, unsigned int offset, unsig
     OclErrors::CheckError(errCode,"OclContext::enqueueReadBuffer");
 }
 
+void OclContext::enqueueWriteBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char **hostMem) {
+    cl_int errCode = clEnqueueWriteBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)*hostMem,0,NULL,NULL);
+    OclErrors::CheckError(errCode,"OclContext::enqueueWriteBuffer");
+}
+
+OclImage* OclContext::createImage2D(OclBuffer::BufferMode  mode, const cl_image_format *format, size_t width, size_t height, size_t row_pitch,
+                               void *data) {
+    cl_int errCode = 0;
+    cl_image_desc image_desc = {0};
+    image_desc.image_type = CL_IMAGE_2D;
+    image_desc.image_width = width;
+    image_desc.image_height = height;
+    image_desc.image_row_pitch = row_pitch;
+    cl_mem clMem = clCreateImage(_context,OclBuffer::translateBufferModeToFlags(mode),format,&image_desc,NULL,&errCode);
+//    cl_mem clMem= clCreateImage2D(_context,OclBuffer::translateBufferModeToFlags(mode),format,width,height,row_pitch,data,&errCode);
+    OclErrors::CheckError(errCode,"OclContext::createImage2D");
+    if(OclErrors::success(errCode))
+    {
+        OclImage* image = new OclImage(clMem);
+        return image;
+    }
+    return nullptr;
+}
+
+OclImage* OclContext::createImage3D(OclBuffer::BufferMode mode, const cl_image_format *format, size_t width,
+                                    size_t height, size_t depth, size_t row_pitch, size_t slice_pitch, void *data) {
+    cl_int errCode = 0;
+    cl_mem clMem= clCreateImage3D(_context,OclBuffer::translateBufferModeToFlags(mode),format,width,height,depth,row_pitch,slice_pitch,data,&errCode);
+    OclErrors::CheckError(errCode,"OclContext::createImage3D");
+    if(OclErrors::success(errCode))
+    {
+        OclImage* image = new OclImage(clMem);
+        return image;
+    }
+    return nullptr;
+}
+void OclContext::enqueueReadImage2D(OclImage *image, unsigned int reginx, unsigned int reginy, char *buffer, unsigned int originx,
+                                    unsigned int originey, unsigned int row_pitch) {
+    size_t regin[3]={reginx,reginy,1};
+    size_t orgin[3]={originx,originey,0};
+    cl_int errCode=clEnqueueReadImage(_command_queue,
+                                      image->getClBuffer(),
+                                      CL_TRUE,
+                                      orgin,
+                                      regin,
+                                      row_pitch,
+                                      0,
+                                      (void*)buffer,
+                                      0,
+                                      NULL,
+                                      NULL);
+    OclErrors::CheckError(errCode,"OclContext::enqueueReadImage2D");
+}
+void OclContext::enqueueWriteImage2D(OclImage *image, unsigned int reginx, unsigned int reginy, char *buffer,
+                                     unsigned int originx, unsigned int originey, unsigned int row_pitch) {
+    size_t regin[3]={reginx,reginy,1};
+    size_t orgin[3]={originx,originey,0};
+    cl_int errCode=clEnqueueWriteImage(_command_queue,
+                                      image->getClBuffer(),
+                                      CL_TRUE,
+                                      orgin,
+                                      regin,
+                                      row_pitch,
+                                      0,
+                                      (void*)buffer,
+                                      0,
+                                      NULL,
+                                      NULL);
+    OclErrors::CheckError(errCode,"OclContext::enqueueWriteImage2D");
+}
 void OclContext::flush() {
     cl_int errCode = clFinish(_command_queue);
     OclErrors::CheckError(errCode,"OclContext::flush");

@@ -40,7 +40,7 @@ void OclEngine::init() {
 /**
  *Create OCL Contxt
  */
-OclContext* OclEngine::createContext(OclContext::ContextProperties contextProperties) {
+OclContext* OclEngine::createGPUContext(OclContext::ContextProperties contextProperties) {
 #if defined(_WIN32)
 
     // Windows
@@ -113,7 +113,7 @@ bool OclEngine::releaseContext(OclContext *context) {
     return false;
 }
 OclContext* OclEngine::createContext() {
-    return createContext({getDefaultPlatform()->platform_id,false});
+    return createGPUContext({getDefaultPlatform()->platform_id,false});
 }
 
 OclEngine* OclEngine::_oclEngine = nullptr;

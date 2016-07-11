@@ -58,7 +58,7 @@ private:
     void init();
 
     bool isPlatformValid(){ return _platformInfo!= nullptr && _platformInfo->num_platforms>0;}
-    OclContext* createContext(OclContext::ContextProperties contextProperties);
+    OclContext* createGPUContext(OclContext::ContextProperties contextProperties);
 
 private:
 
