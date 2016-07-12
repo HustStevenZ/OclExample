@@ -74,7 +74,7 @@ void CentralWidget::processImages() {
 //        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
         QImage* image = imageFilter->filterImage(new QImage(objPath));
 
-        image->save(QDir::homePath()+"/test.png","png");
+//        image->save(QDir::homePath()+"/test.png","png");
         afterW->setFixedSize(400,image->height()*400/image->width());
         afterW->setImage(image);
         afterW->repaint();

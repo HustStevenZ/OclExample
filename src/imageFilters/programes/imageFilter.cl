@@ -21,6 +21,7 @@ __kernel void image_filter( __read_only image2d_t input, __write_only image2d_t 
       int2 rightDownCord = (int2)(coord.x+1,coord.y+1);
 
       //BOUNARY
+      //Treat column[0]=column1,clumn[width+1]=column[width] etc
       if(coord.x==1)
       {
         leftupCord.x=1;

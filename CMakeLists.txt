@@ -74,7 +74,7 @@ set(SOURCE_FILES
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader)
 SET(OBLLOADER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/src)
-SET(OBLLOADER_LIBRARY_DIR /src/thirdparty/objloader/)
+SET(OBLLOADER_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/)
 SET(OBJLOADER_LIBARIES objloader)
 
 include_directories(${OBLLOADER_INCLUDE_DIR})
