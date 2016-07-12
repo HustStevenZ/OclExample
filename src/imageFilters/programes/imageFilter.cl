@@ -10,23 +10,6 @@ __kernel void image_filter( __read_only image2d_t input, __write_only image2d_t 
       int width = get_global_size(0);
       int height = get_global_size(1);
       int2 coord = (int2)(get_global_id(0),get_global_id(1));
-    //  int mody = (int)fmod((float)(coord.y-1+height-1),(float)height);
-      // int2 leftupCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),
-      //                           (int)fmod((float)(coord.y-1+height-1),(float)height));
-      // int2 upCord = (int2)(coord.x,
-      //                     (int)fmod((float)(coord.y-1+height-1),(float)height));
-      // int2 rightupCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)(width)),
-      //                           (int)fmod((float)(coord.y-1+height-1),(float)height));
-      // int2 leftCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),
-      //                                   coord.y);
-      // int2 rightCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),
-      //                       coord.y);
-      // int2 leftDowCord= (int2)((int)fmod((float)(coord.x-1+width-1),(float)width),
-      //                          (int)fmod((float)(coord.y+1+height-1),(float)height));
-      // int2 downCord = (int2)(coord.x,
-      //                        (int)fmod((float)(coord.y+1+height-1),(float)height));
-      // int2 rightDownCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),
-      //                             (int)fmod((float)(coord.y+1+height-1),(float)height));
 
       int2 leftupCord = (int2)(coord.x-1,coord.y-1);
       int2 upCord = (int2)(coord.x,coord.y);

@@ -8,6 +8,12 @@
 
 ImageFilter::ImageFilter() {
 }
+//////////////////////////
+// 3*3 Filter
+//[ * * * ]
+//[ * * * ] * 1/factorsum
+//[ * * * ]
+////////////////////////
 std::string imageFilterKernel="\n"
         "__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;\n"
         "\n"
@@ -16,23 +22,6 @@ std::string imageFilterKernel="\n"
         "      int width = get_global_size(0);\n"
         "      int height = get_global_size(1);\n"
         "      int2 coord = (int2)(get_global_id(0),get_global_id(1));\n"
-        "    //  int mody = (int)fmod((float)(coord.y-1+height-1),(float)height);\n"
-        "      // int2 leftupCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),\n"
-        "      //                           (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
-        "      // int2 upCord = (int2)(coord.x,\n"
-        "      //                     (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
-        "      // int2 rightupCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)(width)),\n"
-        "      //                           (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
-        "      // int2 leftCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),\n"
-        "      //                                   coord.y);\n"
-        "      // int2 rightCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),\n"
-        "      //                       coord.y);\n"
-        "      // int2 leftDowCord= (int2)((int)fmod((float)(coord.x-1+width-1),(float)width),\n"
-        "      //                          (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
-        "      // int2 downCord = (int2)(coord.x,\n"
-        "      //                        (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
-        "      // int2 rightDownCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),\n"
-        "      //                             (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
         "\n"
         "      int2 leftupCord = (int2)(coord.x-1,coord.y-1);\n"
         "      int2 upCord = (int2)(coord.x,coord.y);\n"
