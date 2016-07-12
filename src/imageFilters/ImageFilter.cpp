@@ -76,7 +76,7 @@ std::string imageFilterKernel="\n"
         "       uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+\n"
         "                           convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+\n"
         "                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8])/filtersum);\n"
-        "\n"
+        " \n"
         "      write_imageui(output,coord,resultpixelf);\n"
         "    }";
 
@@ -96,15 +96,30 @@ QImage* ImageFilter::filterImage(QImage *image) {
             1.0/16.0,1.0/8.0,1.0/16.0,
             1/8.0f, 1/4.0f,1.0/8.0f,
             1/16.0f,1/8.0f,1/16.0f};
-    std::cout<<"image size:" <<image->width()<<","<<image->height()<<std::endl;
     OclImage *inputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
     OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
 
     OclBuffer *filterBuffer = _context->createBuffer(9*sizeof(float),OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,NULL);
 
-    QImage imageconverted = image->convertToFormat(QImage::Format_RGBX8888);
+
     _context->enqueueWriteBuffer(filterBuffer,0,9*sizeof(float),(char*)(filter));
-    _context->enqueueWriteImage2D(inputBuffer,image->width(),image->height(),(char*)(imageconverted.bits()));
+    unsigned int *data = new unsigned int[image->width()*image->height()];
+    for(int i = 0;i<image->width();i++)
+    {
+        for(int j=0;j<image->height();j++)
+        {
+            int index = image->width()*j+i;
+            QRgb color = image->pixel(i,j);
+            *(data+image->width()*j+i)=0x00000000;
+
+            *(data+image->width()*j+i)|=(0xff000000&(qRed(color)<<24));
+            *(data+image->width()*j+i)|=(0x00ff0000&(qGreen(color)<<16));
+            *(data+image->width()*j+i)|=(0x0000ff00&(qBlue(color)<<8));
+            *(data+image->width()*j+i)|=(0x000000ff&(qAlpha(color)));
+//            *(data+image->width()*j+i)=0xff000000;
+        }
+    }
+    _context->enqueueWriteImage2D(inputBuffer,image->width(),image->height(),(char*)(data));
     oclKernel->setKernelArgBuffer(0,inputBuffer);
     oclKernel->setKernelArgBuffer(1,outputBuffer);
     oclKernel->setKernelArgBuffer(2,filterBuffer);
@@ -113,21 +128,34 @@ QImage* ImageFilter::filterImage(QImage *image) {
     _context->enqueueKernel(oclKernel,2,NULL,work_size,NULL);
 
     _context->flush();
-    char* buffer = new char[image->width()*image->height()*sizeof(int)];
+    unsigned int* buffer = new unsigned int[image->width()*image->height()];
 
-    _context->enqueueReadImage2D(outputBuffer,image->width(),image->height(),buffer);
-
-    delete inputBuffer;
-    delete outputBuffer;
-    delete filterBuffer;
-    delete oclKernel;
-    delete oclProgram;
-    if(strlen(buffer)>0)
+    _context->enqueueReadImage2D(outputBuffer,image->width(),image->height(),(char*)buffer);
+    QSize imageSize(image->width(),image->height());
+    QImage *resultImage = new QImage(imageSize,QImage::Format_RGBX8888);
+//    QRgb *imageData = new QRgb[image->width()*image->height()];
+    for(int i = 0;i<image->width();i++)
     {
-
-        return new QImage((uchar*)buffer,image->width(),image->height(),QImage::Format_RGBX8888);
-
+        for(int j=0;j<image->height();j++)
+        {
+            int index = image->width()*j+i;
+            int red=((*(buffer+index))&0xff000000)>>24;
+            int green=((*(buffer+index))&0x00ff0000)>>16;
+            int blue=((*(buffer+index))&0x0000ff00)>>8;
+            int alpha=((*(buffer+index))&0x000000ff);
+//            *(imageData+index)=qRgba(red,green,blue,alpha);
+            resultImage->setPixel(i,j,qRgba(red,green,blue,alpha));
+            //resultImage->setColor(index,qRgba(red,green,blue,alpha));
+        }
     }
+
+//    delete inputBuffer;
+//    delete outputBuffer;
+//    delete filterBuffer;
+//    delete oclKernel;
+//    delete oclProgram;
+    return resultImage;
+
 
 }
 

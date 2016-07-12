@@ -23,7 +23,11 @@ unsigned long OclBuffer::translateBufferModeToFlags(BufferMode mode) {
     }
     if(mode&OclBuffer::BufferMode::OCL_BUFFER_HOST_READ_ONLY)
     {
-        flags != CL_MEM_HOST_READ_ONLY;
+        flags |= CL_MEM_HOST_READ_ONLY;
+    }
+    if(mode&OclBuffer::BufferMode::OCL_BUFFER_USER_HOST_PTR)
+    {
+        flags |= CL_MEM_USE_HOST_PTR;
     }
     return flags;
 }
