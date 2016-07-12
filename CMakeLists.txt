@@ -33,40 +33,40 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 #link_libraries(Qt5::Widgets)
 set(SOURCE_FILES
-        src/gui/CentralWidget.cpp
-        src/gui/CentralWidget.h
-        src/OclExample.cpp
-        src/io/Meshloader.cpp
-        src/io/Meshloader.h
-        src/gui/ImageWidget.cpp
-        src/gui/ImageWidget.h
-        src/ocl/OclImage.cpp
-        src/ocl/OclImage.h
-        src/ocl/OclBuffer.cpp
-        src/ocl/OclBuffer.h
-        src/ocl/OclProgram.cpp
-        src/ocl/OclProgram.h
-        src/ocl/OclKernel.cpp
-        src/ocl/OclKernel.h
-        src/ocl/OclCommandQueue.cpp
-        src/ocl/OclCommandQueue.h
-        src/ocl/OclContext.cpp
-        src/ocl/OclContext.h
-        src/ocl/OclSampler.cpp
-        src/ocl/OclSampler.h
-        src/ocl/OclEvent.cpp
-        src/ocl/OclEvent.h
-        src/ocl/OclEngine.cpp
-        src/ocl/OclEngine.h
-        src/ocl/OclHeader.h
-        src/ocl/OclErrors.cpp
-        src/ocl/OclErrors.h
-        src/imageFilters/ImageFilter.cpp
-        src/imageFilters/ImageFilter.h
-        src/common/Image.cpp
-        src/common/Image.h
-        src/io/clSource.cpp
-        src/io/clSource.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CentralWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CentralWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/OclExample.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclImage.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclImage.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclBuffer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclBuffer.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclProgram.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclProgram.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclKernel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclKernel.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclCommandQueue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclCommandQueue.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclContext.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclContext.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclSampler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclSampler.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclEvent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclEvent.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclEngine.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclEngine.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclHeader.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclErrors.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclErrors.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imageFilters/ImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imageFilters/ImageFilter.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.h)
 
 #####################################################################
 ###           objloader Dependencies                             ###
