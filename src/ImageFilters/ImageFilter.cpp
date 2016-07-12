@@ -8,14 +8,51 @@
 
 ImageFilter::ImageFilter() {
 }
-std::string imageFilterKernel="__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE |\n"
-        "CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;\n"
-        "__kernel void image_filter( __read_only image2d_t input, __write_only image2d_t output) {\n"
+std::string imageFilterKernel="\n"
+        "__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;\n"
         "\n"
-        "    int2 coord = (int2)(get_global_id(0),get_global_id(1));\n"
-        "    uint4 pixel = read_imageui(input,sampler,coord);\n"
-        "    write_imageui(output,coord,pixel);\n"
-        "}";
+        "__kernel void image_filter( __read_only image2d_t input, __write_only image2d_t output,__global float* filter) {\n"
+        "\n"
+        "      int width = get_global_size(0);\n"
+        "      int height = get_global_size(1);\n"
+        "      int2 coord = (int2)(get_global_id(0),get_global_id(1));\n"
+        "    //  int mody = (int)fmod((float)(coord.y-1+height-1),(float)height);\n"
+        "      int2 leftupCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),\n"
+        "                                (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
+        "      int2 upCord = (int2)(coord.x,\n"
+        "                          (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
+        "      int2 rightupCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)(width)),\n"
+        "                                (int)fmod((float)(coord.y-1+height-1),(float)height));\n"
+        "      int2 leftCord = (int2)((int)fmod((float)(coord.x-1+width-1),(float)(width)),\n"
+        "                                        coord.y);\n"
+        "      int2 rightCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),\n"
+        "                            coord.y);\n"
+        "      int2 leftDowCord= (int2)((int)fmod((float)(coord.x-1+width-1),(float)width),\n"
+        "                               (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
+        "      int2 downCord = (int2)(coord.x,\n"
+        "                             (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
+        "      int2 rightDownCord = (int2)((int)fmod((float)(coord.x+1+width-1),(float)width),\n"
+        "                                  (int)fmod((float)(coord.y+1+height-1),(float)height));\n"
+        "\n"
+        "\n"
+        "      uint4 pixel = read_imageui(input,sampler,coord);\n"
+        "      uint4 pleftup = read_imageui(input,sampler,leftupCord);\n"
+        "      uint4 pup = read_imageui(input,sampler,upCord);\n"
+        "      uint4 prightup = read_imageui(input,sampler,rightupCord);\n"
+        "      uint4 pleft = read_imageui(input,sampler,leftCord);\n"
+        "      uint4 pright = read_imageui(input,sampler,rightCord);\n"
+        "      uint4 pleftdown = read_imageui(input,sampler,leftDowCord);\n"
+        "      uint4 pdown = read_imageui(input,sampler,downCord);\n"
+        "      uint4 prightdown = read_imageui(input,sampler,rightDownCord);\n"
+        "      // uint4 resultpixel = (uint4)(((float4)pleftup*filter[0]+(float4)pup*filter[1]+(float4)prightup*filter[2]+\n"
+        "      //                     (float4)pleft*filter[3]+(float4)pixel*filter[4]+(float4)pright*filter[5]+\n"
+        "      //                     (float4)pleftdown*filter[6]+(float4)pdown*filter[7]+(float4)prightdown*filter[8])/9.0f);\n"
+        "       uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+\n"
+        "                           convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+\n"
+        "                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8])/9.0f);\n"
+        "\n"
+        "      write_imageui(output,coord,resultpixelf);\n"
+        "    }";
 
 QImage* ImageFilter::filterImage(QImage *image) {
 
@@ -29,14 +66,20 @@ QImage* ImageFilter::filterImage(QImage *image) {
     rgb_format.image_channel_order = CL_RGBA;
     rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
 
+    float filter[9]={0.5f,1.0f,0.5f,
+                     1.0f,2.0f,1.0f,
+                     0.5f,1.0f,0.5f};
     OclImage *inputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
     OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
 
+    OclBuffer *filterBuffer = _context->createBuffer(9*sizeof(float),OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,NULL);
 
     QImage imageconverted = image->convertToFormat(QImage::Format_RGBX8888);
+    _context->enqueueWriteBuffer(filterBuffer,0,9*sizeof(float),(char*)(filter));
     _context->enqueueWriteImage2D(inputBuffer,image->width(),image->height(),(char*)(imageconverted.bits()));
     oclKernel->setKernelArgBuffer(0,inputBuffer);
     oclKernel->setKernelArgBuffer(1,outputBuffer);
+    oclKernel->setKernelArgBuffer(2,filterBuffer);
 
     size_t work_size[]= {(size_t)image->width(),(size_t)image->height()};
     _context->enqueueKernel(oclKernel,2,NULL,work_size,NULL);
@@ -45,8 +88,13 @@ QImage* ImageFilter::filterImage(QImage *image) {
     char* buffer = new char[image->width()*image->height()*sizeof(int)];
 
     _context->enqueueReadImage2D(outputBuffer,image->width(),image->height(),buffer);
-//    _context->?(outputBuffer,0,1024*1024*sizeof(int),&(buffer));
 
+//
+//    delete inputBuffer;
+//    delete outputBuffer;
+//    delete filterBuffer;
+//    delete oclKernel;
+//    delete oclProgram;
     if(strlen(buffer)>0)
     {
 
@@ -74,7 +122,7 @@ std::string ImageFilter::testHelloWorld() {
     _context->flush();
     char* buffer = new char[1024*sizeof(int)];
 
-    _context->enqueueReadBuffer(inputoclBuffer,0,1024*sizeof(int),&(buffer));
+    _context->enqueueReadBuffer(inputoclBuffer,0,1024*sizeof(int),(buffer));
     return std::string(buffer);
 
 

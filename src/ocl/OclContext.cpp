@@ -49,7 +49,7 @@ OclBuffer* OclContext::createBuffer(int size, OclBuffer::BufferMode mode, char *
     cl_int errCode;
     if(size<=0)
         return nullptr;
-    cl_mem buffer=clCreateBuffer(_context,CL_MEM_WRITE_ONLY,size,host_ptr,&errCode);
+    cl_mem buffer=clCreateBuffer(_context,flags,size,host_ptr,&errCode);
     if(OclErrors::success(errCode))
     {
 
@@ -68,13 +68,13 @@ void OclContext::enqueueKernel(OclKernel *kernel,unsigned int work_dimension, si
 
 }
 
-void OclContext::enqueueReadBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char **hostMem) {
-    cl_int errCode = clEnqueueReadBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)*hostMem,0,NULL,NULL);
+void OclContext::enqueueReadBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char *hostMem) {
+    cl_int errCode = clEnqueueReadBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)hostMem,0,NULL,NULL);
     OclErrors::CheckError(errCode,"OclContext::enqueueReadBuffer");
 }
 
-void OclContext::enqueueWriteBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char **hostMem) {
-    cl_int errCode = clEnqueueWriteBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)*hostMem,0,NULL,NULL);
+void OclContext::enqueueWriteBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char *hostMem) {
+    cl_int errCode = clEnqueueWriteBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)hostMem,0,NULL,NULL);
     OclErrors::CheckError(errCode,"OclContext::enqueueWriteBuffer");
 }
 

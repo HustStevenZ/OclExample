@@ -32,13 +32,13 @@ public:
 
     void enqueueKernel(OclKernel* kernel,unsigned int work_dimension,size_t * work_offset,size_t * work_size,size_t * local_size);
 
-    void enqueueReadBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char** hostMem);
+    void enqueueReadBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char* hostMem);
 
     void enqueueReadImage2D(OclImage* image, unsigned int reginx,
                             unsigned int reginy,char* buffer,  unsigned int originx =0 , unsigned int originey=0,unsigned int row_pitch = 0);
     void enqueueWriteImage2D(OclImage* image, unsigned int reginx,
                              unsigned int reginy,char* buffer,  unsigned int originx =0 , unsigned int originey=0,unsigned int row_pitch = 0);
-    void enqueueWriteBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char** hostMem);
+    void enqueueWriteBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char* hostMem);
 
     void mapReadBuffer(OclBuffer*buffer,unsigned int size,char *hostMeme);
 
