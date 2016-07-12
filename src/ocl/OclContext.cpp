@@ -82,13 +82,18 @@ OclImage* OclContext::createImage2D(OclBuffer::BufferMode  mode, const cl_image_
                                void *data) {
     cl_int errCode = 0;
     cl_image_desc image_desc = {0};
-    image_desc.image_type = CL_IMAGE_2D;
+    image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
     image_desc.image_width = width;
     image_desc.image_height = height;
-    image_desc.image_row_pitch = row_pitch;
+    if(data!=NULL)
+    {
+        image_desc.image_row_pitch = row_pitch;
+    }
+
     cl_mem clMem = clCreateImage(_context,OclBuffer::translateBufferModeToFlags(mode),format,&image_desc,NULL,&errCode);
 //    cl_mem clMem= clCreateImage2D(_context,OclBuffer::translateBufferModeToFlags(mode),format,width,height,row_pitch,data,&errCode);
     OclErrors::CheckError(errCode,"OclContext::createImage2D");
+
     if(OclErrors::success(errCode))
     {
         OclImage* image = new OclImage(clMem);

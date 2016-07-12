@@ -6,8 +6,8 @@
 #define OCLEXAMPLE_OCLEXAMPLEGUI_H
 
 #include <QtWidgets>
-#include <src/io/Meshloader.h>
-#include <src/ImageFilters/ImageFilter.h>
+#include "src/io/Meshloader.h"
+#include "src/imageFilters/ImageFilter.h"
 #include "ImageWidget.h"
 
 class CentralWidget: public QWidget {

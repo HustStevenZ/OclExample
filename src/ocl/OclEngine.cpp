@@ -4,7 +4,8 @@
 
 #include "OclEngine.h"
 #include "OclErrors.h"
-#include <Vector>
+#include <vector>
+#include <algorithm>
 
 /***
  * Construction for OclEngine
@@ -70,10 +71,10 @@ OclContext* OclEngine::createGPUContext(OclContext::ContextProperties contextPro
 
     // Linux
     cl_context_properties properties[] = {
-      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
-      CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+//      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+ //     CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
       CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
-      CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
+ //     CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
       0
     };
 

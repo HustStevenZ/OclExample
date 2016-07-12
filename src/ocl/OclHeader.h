@@ -11,6 +11,10 @@
 #include <OpenCL/opencl.h>
 #include <OpenCL/cl.h>
 #include <OpenGL/OpenGL.h>
+#else
+
+#include <CL/opencl.h>
+#include <CL/cl.h>
 #endif
 /*******
  * TODO: Linux & Windows
