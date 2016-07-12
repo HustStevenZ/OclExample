@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.0)
 project(OclExample)
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -83,13 +85,13 @@ link_directories(${OBLLOADER_LIBRARY_DIR})
 ###           OpenCL
 #####################################################################
 find_package(OpenCL REQUIRED)
-if (OpenCL_FOUND)
+#if (OpenCL_FOUND)
     include_directories(${OpenCL_INCLUDE_DIRS})
     link_directories(${OpenCL_LIBRARIES})
     link_libraries(${OpenCL_LIBRARIES})
-elseif(NOT OpenCL_FOUND)
-    message("OpenCL is not installed!")
-endif()
+    #elseif(NOT OpenCL_FOUND)
+    #message("OpenCL is not installed!")
+    #endif()
 
 
 #####################################################################
