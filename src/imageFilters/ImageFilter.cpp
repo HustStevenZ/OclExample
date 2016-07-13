@@ -93,9 +93,9 @@ QImage* ImageFilter::filterImage(QImage *image) {
     rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
 
     float filter[9]={
-            1.0/16.0,1.0/8.0,1.0/16.0,
-            1/8.0f, 1/4.0f,1.0/8.0f,
-            1/16.0f,1/8.0f,1/16.0f};
+            1.0,1.0,1.0,
+            1.0f, 1.0f,1.0f,
+            1.0f,1.0f,1.0f};
     OclImage *inputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
     OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
 
