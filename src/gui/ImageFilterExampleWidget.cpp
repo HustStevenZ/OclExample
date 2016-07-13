@@ -2,13 +2,13 @@
 // Created by Sanqian on 16/7/7.
 //
 
-#include "CentralWidget.h"
+#include "ImageFilterExampleWidget.h"
 #include "ImageWidget.h"
 #include <QWidget>
 //#include <QOpenGLWidget>
 
-CentralWidget::CentralWidget() {
-    setWindowTitle(tr("OpenCL Examples"));
+ImageFilterExampleWidget::ImageFilterExampleWidget(QWidget* parent) {
+    setWindowTitle(tr("OpenCL Image Filter Examples"));
 
     setFixedSize(820,500);
     ImageWidget *before = new ImageWidget(this);
@@ -38,22 +38,24 @@ CentralWidget::CentralWidget() {
 
 }
 
-void CentralWidget::createMenu()
+void ImageFilterExampleWidget::createMenu()
 {
 
    menuBar = new QMenuBar(this);
     menuBar->setVisible(true);
-    QMenu *fileMenu = menuBar->addMenu(tr("&File"));
+    QMenu *_2dMenu = menuBar->addMenu(tr("&File"));
+//    QMenu *_filterMenu = menuBar->addMenu(tr("&Image Filter"));
 //    menuBar->setFixedSize(820,20);
     menuBar->setEnabled(true);
     menuBar->setNativeMenuBar(false);//Try to bypass the mac os display menu problem
-    QAction *openAction = new QAction(tr("&Open"),fileMenu);
-    fileMenu->addAction(openAction);
-    connect(openAction,&QAction::triggered,this,&CentralWidget::open);
+    QAction *openAction = new QAction(tr("&Open"),_2dMenu);
+    _2dMenu->addAction(openAction);
+    connect(openAction,&QAction::triggered,this,&ImageFilterExampleWidget::open);
+
 
 }
 
-void CentralWidget::open() {
+void ImageFilterExampleWidget::open() {
     this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
 
     if(!isFileValid())
@@ -68,7 +70,7 @@ void CentralWidget::open() {
     }
 }
 
-void CentralWidget::processImages() {
+void ImageFilterExampleWidget::processImages() {
     if(isFileValid()) {
 //        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
         QImage* image = imageFilter->filterImage(new QImage(objPath));

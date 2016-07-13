@@ -10,19 +10,24 @@
 #include "src/imageFilters/ImageFilter.h"
 #include "ImageWidget.h"
 
-class CentralWidget: public QWidget {
+class ImageFilterExampleWidget: public QWidget {
 Q_OBJECT
 
 public:
-    CentralWidget();
+    ImageFilterExampleWidget(QWidget* parent);
 
+    ~ImageFilterExampleWidget(){
+        if(imageFilter!= nullptr)
+        {
+            delete imageFilter;
+        }
+    }
 private:
     void createMenu();
     void processImages();
     bool isFileValid(){ return  !objPath.isEmpty()&&(objPath.endsWith(".jpg")
                                                      || objPath.endsWith(".png")
                                                      || objPath.endsWith(".jpeg"));};
-
 private slots:
     void open();
 

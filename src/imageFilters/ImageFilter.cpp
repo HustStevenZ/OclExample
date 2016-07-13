@@ -149,11 +149,14 @@ QImage* ImageFilter::filterImage(QImage *image) {
         }
     }
 
-//    delete inputBuffer;
-//    delete outputBuffer;
-//    delete filterBuffer;
-//    delete oclKernel;
-//    delete oclProgram;
+    delete inputBuffer;
+    delete outputBuffer;
+    delete filterBuffer;
+    delete oclKernel;
+    delete oclProgram;
+    delete data;
+    delete buffer;
+
     return resultImage;
 
 

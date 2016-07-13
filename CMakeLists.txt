@@ -33,8 +33,8 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 #link_libraries(Qt5::Widgets)
 set(SOURCE_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CentralWidget.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/CentralWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageFilterExampleWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageFilterExampleWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/OclExample.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.h
@@ -63,10 +63,10 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclErrors.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageFilters/ImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageFilters/ImageFilter.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image2D.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image2D.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.h src/common/Color.cpp src/common/Color.h src/gui/MainWidget.cpp src/gui/MainWidget.h)
 
 #####################################################################
 ###           objloader Dependencies                             ###

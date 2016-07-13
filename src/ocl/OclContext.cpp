@@ -131,6 +131,9 @@ void OclContext::enqueueReadImage2D(OclImage *image, unsigned int reginx, unsign
                                       NULL);
     OclErrors::CheckError(errCode,"OclContext::enqueueReadImage2D");
 }
+
+
+
 void OclContext::enqueueWriteImage2D(OclImage *image, unsigned int reginx, unsigned int reginy, char *buffer,
                                      unsigned int originx, unsigned int originey, unsigned int row_pitch) {
     size_t regin[3]={reginx,reginy,1};

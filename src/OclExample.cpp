@@ -4,12 +4,15 @@
 #include <cstdio>
 #include <QApplication>
 #include <QWidget>
-#include <src/gui/CentralWidget.h>
+#include <src/gui/ImageFilterExampleWidget.h>
+#include <src/gui/MainWidget.h>
 
 int main(int argc, char **argv) {
 
     QApplication app(argc, argv);
-    CentralWidget widget;
-    widget.show();
+//    ImageFilterExampleWidget widget;
+//    widget.show();
+    MainWidget mainWindow;
+    mainWindow.show();
     return app.exec();
 }

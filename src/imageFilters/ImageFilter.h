@@ -13,6 +13,12 @@ class ImageFilter {
 
 public:
     ImageFilter();
+    ~ImageFilter(){
+        if(_context!= nullptr)
+        {
+            delete _context;
+        }
+    }
 
     /**
      * TODO: Perhaps we may have time to isolate ImageFilter from QImage in the future
