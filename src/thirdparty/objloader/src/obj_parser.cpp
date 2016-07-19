@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string>
 #include "obj_parser.h"
 #include "list.h"
 #include "string_extra.h"
@@ -164,7 +165,11 @@ obj_vector* obj_parse_vector()
 	obj_vector *v = (obj_vector*)malloc(sizeof(obj_vector));
 	v->e[0] = atof( strtok(NULL, WHITESPACE));
 	v->e[1] = atof( strtok(NULL, WHITESPACE));
-	v->e[2] = atof( strtok(NULL, WHITESPACE));
+	char* lastElement = strtok(NULL, WHITESPACE);
+	if(lastElement!= nullptr)
+		v->e[2] = atof( lastElement);
+	else
+		v->e[2] = 0.0f;
 	return v;
 }
 
@@ -272,6 +277,11 @@ int obj_parse_mtl_file(char *filename, list *material_list)
 		}
 		// texture map
 		else if( strequal(current_token, "map_Ka") && material_open)
+		{
+			strncpy(current_mtl->texture_filename, strtok(NULL, " \t"), OBJ_FILENAME_LENGTH);
+		}
+			//texture
+		else if( strequal(current_token, "map_Kd") && material_open)
 		{
 			strncpy(current_mtl->texture_filename, strtok(NULL, " \t"), OBJ_FILENAME_LENGTH);
 		}
@@ -403,7 +413,10 @@ int obj_parse_obj_file(obj_growable_scene_data *growable_data, char *filename)
 		else if( strequal(current_token, "mtllib") ) // mtllib
 		{
 			strncpy(growable_data->material_filename, strtok(NULL, WHITESPACE), OBJ_FILENAME_LENGTH);
-			obj_parse_mtl_file(growable_data->material_filename, &growable_data->material_list);
+			std::string filePath(filename);
+			std::string dirpath = filePath.substr(0,filePath.find_last_of("/"));
+			std::string materialpath = dirpath+"/"+growable_data->material_filename;
+			obj_parse_mtl_file((char*)materialpath.c_str(), &growable_data->material_list);
 			continue;
 		}
 		

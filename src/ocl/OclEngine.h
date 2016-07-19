@@ -49,6 +49,7 @@ public:
     }
 
     OclContext* createContext();
+    OclContext* createContext(bool withGpuContext);
 
     bool releaseContext(OclContext* context);
 

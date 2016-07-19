@@ -15,6 +15,7 @@ public:
 
 private:
     void imageFilterExamples();
+    void oglExamples();
 };
 
 

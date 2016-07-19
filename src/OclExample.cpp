@@ -12,6 +12,12 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
 //    ImageFilterExampleWidget widget;
 //    widget.show();
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    QSurfaceFormat::setDefaultFormat(format);
+
+
     MainWidget mainWindow;
     mainWindow.show();
     return app.exec();

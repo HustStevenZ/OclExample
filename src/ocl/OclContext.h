@@ -49,6 +49,7 @@ public:
 
 public:
     struct ContextProperties{
+        bool useSharedGPUContex;
         cl_platform_id context_platform;
         cl_bool context_interop_user_sync;
     };

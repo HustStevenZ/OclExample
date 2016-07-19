@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include "MainWidget.h"
 #include "ImageFilterExampleWidget.h"
+#include "OglExampleWidget.h"
 
 MainWidget::MainWidget() {
 
@@ -20,11 +21,16 @@ MainWidget::MainWidget() {
 
     QPushButton* oglExampleButton = new QPushButton("OpenGL Example",this);
     mainLayout->addWidget(oglExampleButton);
-
+    connect(oglExampleButton,&QPushButton::clicked,this,&MainWidget::oglExamples);
 }
 
 void MainWidget::imageFilterExamples() {
     ImageFilterExampleWidget* widget = new ImageFilterExampleWidget(this);
     widget->show();
 //    this->hide();
+}
+
+void MainWidget::oglExamples() {
+    OglExampleWidget* widget = new OglExampleWidget(this);
+    widget->show();
 }

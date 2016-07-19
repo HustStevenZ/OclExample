@@ -36,8 +36,6 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageFilterExampleWidget.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageFilterExampleWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/OclExample.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/Meshloader.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageWidget.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/ImageWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ocl/OclImage.cpp
@@ -66,7 +64,15 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image2D.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Image2D.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.h src/common/Color.cpp src/common/Color.h src/gui/MainWidget.cpp src/gui/MainWidget.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/io/clSource.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Color.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/common/Color.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/MainWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/MainWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/OglWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/OglWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/OglExampleWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/OglExampleWidget.h)
 
 #####################################################################
 ###           objloader Dependencies                             ###

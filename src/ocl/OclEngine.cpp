@@ -42,42 +42,77 @@ void OclEngine::init() {
  *Create OCL Contxt
  */
 OclContext* OclEngine::createGPUContext(OclContext::ContextProperties contextProperties) {
+
+
+    int contextPropertiSize = 3;
+    const int PLATFORM_PROPERTY_END=2;
+    if(contextProperties.useSharedGPUContex);
+        contextPropertiSize+=4;
+    cl_context_properties* properties = new cl_context_properties[contextPropertiSize];
+    //Add the common part
+    properties[0] = CL_CONTEXT_PLATFORM;
+    properties[1] = (cl_context_properties)contextProperties.context_platform;
+    properties[PLATFORM_PROPERTY_END] = 0;
+
 #if defined(_WIN32)
 
-    // Windows
-    cl_context_properties properties[] = {
-      CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-      CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-      CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
-      CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
-      0
-    };
+//    // Windows
+//    cl_context_properties properties[] = {
+//      CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
+//      CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
+//      CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
+//      CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
+//      0
+//    };
+    if(contextProperties.useSharedGPUContex && (wglGetCurrentContext()!=nullptr)
+    && wglGetCurrentDC()!=nullptr)
+    {
+         properties[PLATFORM_PROPERTY_END+4] = 0;
+         properties[PLATFORM_PROPERTY_END] = CL_GL_CONTEXT_KHR;
+         properties[PLATFORM_PROPERTY_END+1] = (cl_context_properties)wglGetCurrentContext();
+         properties[PLATFORM_PROPERTY_END+2] = CL_WGL_HDC_KHR;
+         properties[PLATFORM_PROPERTY_END+3] = (cl_context_properties)wglGetCurrentDC();
+
+    }
 
 #elif defined(__APPLE__)
 
     // OS X
+
     CGLContextObj     kCGLContext     = CGLGetCurrentContext();
+
     CGLShareGroupObj  kCGLShareGroup  = CGLGetShareGroup(kCGLContext);
 
-    cl_context_properties properties[] = {
-//            CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
-//            (cl_context_properties) kCGLShareGroup,
-            CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
-//            CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
-            0
-    };
-
+    if(contextProperties.useSharedGPUContex && kCGLShareGroup!= nullptr)
+    {
+        properties[PLATFORM_PROPERTY_END+2]  = 0;
+        properties[PLATFORM_PROPERTY_END] = CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE;
+        properties[PLATFORM_PROPERTY_END+1] = (cl_context_properties) kCGLShareGroup;
+    }
+//    {
+//            CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
+//            0
+//    };
 #else
 
-    // Linux
-    cl_context_properties properties[] = {
-//      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
- //     CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
-      CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
- //     CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
-      0
-    };
+//    // Linux
+//    cl_context_properties properties[] = {
+////      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+// //     CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+//      CL_CONTEXT_PLATFORM,(cl_context_properties) contextProperties.context_platform,
+// //     CL_CONTEXT_INTEROP_USER_SYNC,(cl_context_properties) contextProperties.context_interop_user_sync,
+//      0
+//    };
+if(contextProperties.useSharedGPUContex && (glXGetCurrentContext()!=nullptr)
+    && glXGetCurrentDisplay()!=nullptr)
+    {
+         properties[PLATFORM_PROPERTY_END+4] = 0;
+         properties[PLATFORM_PROPERTY_END] = CL_GL_CONTEXT_KHR;
+         properties[PLATFORM_PROPERTY_END+1] = (cl_context_properties)glXGetCurrentContext();
+         properties[PLATFORM_PROPERTY_END+2] = CL_GLX_DISPLAY_KHR;
+         properties[PLATFORM_PROPERTY_END+3] = (cl_context_properties)glXGetCurrentDisplay();
 
+    }
 #endif
 
     PlatformInfo* defaultPlatform = getDefaultPlatform();
@@ -114,7 +149,11 @@ bool OclEngine::releaseContext(OclContext *context) {
     return false;
 }
 OclContext* OclEngine::createContext() {
-    return createGPUContext({getDefaultPlatform()->platform_id,false});
+    return createGPUContext({false,getDefaultPlatform()->platform_id,true});
+}
+
+OclContext* OclEngine::createContext(bool withGpuContext) {
+    return createGPUContext({withGpuContext,getDefaultPlatform()->platform_id,true});
 }
 
 OclEngine* OclEngine::_oclEngine = nullptr;
