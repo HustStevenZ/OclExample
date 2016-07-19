@@ -10,7 +10,10 @@
 #include <QOpenGLWidget>
 #include "objLoader.h"
 #include "OglWidget.h"
-
+#include <glm.h>
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 class OglExampleWidget : public QWidget{
 Q_OBJECT
 public:
@@ -20,7 +23,10 @@ public:
 private:
     void openMesh();
     OglWidget* display = nullptr;
-    objLoader* meshloader = nullptr;
+//    objLoader* meshloader = nullptr;
+//    GLMmodel* meshloader = nullptr;
+    aiScene *scene = nullptr;
+
 
 };
 

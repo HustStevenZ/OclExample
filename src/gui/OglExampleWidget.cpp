@@ -48,15 +48,18 @@ void OglExampleWidget::openMesh() {
     QString fileName = QFileDialog::getOpenFileName(this,"Open Mesh",QDir::homePath(),"*.obj");
     if(!fileName.isEmpty())
     {
-        if(meshloader!= nullptr)
+        if(scene!= nullptr)
         {
-            delete meshloader;
-            meshloader = nullptr;
+            aiReleaseImport(scene);
+//            delete scene;
+            scene = nullptr;
         }
 
-        meshloader = new objLoader();
-        meshloader->load((char*)(fileName.toStdString().c_str()));
-        display->loadModel(meshloader);
+//        scene = (aiScene*)aiImportFile(fileName.toStdString().c_str(),aiProcessPreset_TargetRealtime_MaxQuality);
+        display->loadModel(fileName);
+//        meshloader = glmReadOBJ(fileName.toStdString().c_str());
+//        //meshloader->load((char*)(fileName.toStdString().c_str()));
+//        display->loadModel(meshloader);
 
     }
 }

@@ -12,8 +12,10 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <objLoader.h>
+#include <glm.h>
+#include <assimp/scene.h>
 
-class OglWidget : public QOpenGLWidget{
+class OglWidget : public QOpenGLWidget, protected QOpenGLFunctions{
 
 Q_OBJECT
 
@@ -26,6 +28,9 @@ public:
     void rotateBy(int xAngle, int yAngle, int zAngle);
     void setClearColor(const QColor &color);
     void loadModel(objLoader* loader);
+    void loadModel(GLMmodel* model);
+    void loadModel(aiScene* scene);
+    void loadModel(QString filePath);
 
 signals:
     void clicked();
@@ -41,9 +46,10 @@ protected:
 private:
     void makeObject();
     void setVertices(objLoader* objInfo);
-    void setTexCoords(objLoader* objInfo);
-    void setFaces(objLoader* objInfo);
-    void setMatierial(objLoader* objInfo);
+    void setVertices(GLMmodel* objInfo);
+    void setVertices(aiScene* scene);
+    void setTextures(aiScene* scene);
+
 
     void reinitVbo();
 
@@ -59,6 +65,9 @@ private:
     QOpenGLShader* fshader;
     QOpenGLBuffer vbo;
     QOpenGLBuffer ibo;
+    QMap<int,QOpenGLTexture*> textures;
+    QString modelFilePath;
+//    QOpenGLTexture* textures;
 
 };
 

@@ -79,6 +79,7 @@ set(SOURCE_FILES
 #####################################################################
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader)
+
 SET(OBLLOADER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/src)
 SET(OBLLOADER_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/objloader/)
 SET(OBJLOADER_LIBARIES objloader)
@@ -86,6 +87,27 @@ SET(OBJLOADER_LIBARIES objloader)
 include_directories(${OBLLOADER_INCLUDE_DIR})
 link_directories(${OBLLOADER_LIBRARY_DIR})
 
+
+#####################################################################
+###           glm obj loader
+#####################################################################
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/glm)
+
+SET(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/glm/)
+SET(GLM_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty/glm/)
+SET(GLM_LIBARIES glm)
+
+include_directories(${GLM_INCLUDE_DIR})
+link_directories(${GLM_LIBRARY_DIR})
+
+
+#####################################################################
+###           Assimp importer
+#####################################################################
+find_package(Assimp REQUIRED)
+include_directories(${ASSIMP_INCLUDE_DIR})
+link_directories(${ASSIMP_LIBRARY_DIR})
 
 #####################################################################
 ###           OpenCL
@@ -125,4 +147,5 @@ file(COPY src/imageFilters/programes/ DESTINATION "${CL_OUTPUT_DIR}/imageFilters
 add_definitions("-DDEBUG")
 add_executable(OclExample ${SOURCE_FILES})
 target_link_libraries(OclExample Qt5::Widgets Qt5::Core Qt5::Gui)
-target_link_libraries(OclExample objloader)
+target_link_libraries(OclExample objloader glm)
+target_link_libraries(OclExample assimp)
