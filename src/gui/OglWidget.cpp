@@ -3,6 +3,7 @@
 //
 
 #include "OglWidget.h"
+#include "OglExampleWidget.h"
 #include <QMouseEvent>
 #include <iostream>
 #include <assimp/cimport.h>
@@ -143,8 +144,10 @@ void OglWidget::paintGL()
                 textures[i]->bind();
             }
         }
+
         glDrawArrays(GL_TRIANGLES, 0, verticeData.size()/3);
 
+        updateParent();
     }
 
 }
@@ -420,8 +423,6 @@ void OglWidget::setTextures(aiScene *scene) {
                 QImage image(texpath);
                 QOpenGLTexture* tex = new QOpenGLTexture(image);
 
-//                tex->create();
-//                tex->bind();
                 textures.insert(texIndex,tex);
                 texIndex++;
             }
@@ -435,4 +436,28 @@ void OglWidget::loadModel(QString filePath) {
 
     modelFilePath = filePath;
     loadModel(scene);
+}
+
+void OglWidget::updateParent() {
+
+    int width = 0;
+    int height = 0;
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_WIDTH,&width);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_HEIGHT,&height);
+    unsigned int* buffer = (unsigned int*)malloc(sizeof(unsigned int)*width*height);
+    glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_INT_8_8_8_8,buffer);//Read from lower left
+
+    QImage* image = new QImage(width,height,QImage::Format_RGBA8888);
+    for(int i = 0;i<width;i++)
+        for(int j = 0;j<height;j++)
+        {
+            QColor color;
+            int rgba = buffer[(height-1-j)*width+i];
+            color.setRed((rgba&0xff000000)>>24);
+            color.setGreen((rgba&0x00ff0000)>>16);
+            color.setBlue((rgba&0x0000ff00)>>8);
+            color.setAlpha((rgba&0x000000ff));
+            image->setPixelColor(i,j,color);
+        }
+    emit displayChanged(image);
 }

@@ -40,8 +40,11 @@ OglExampleWidget::OglExampleWidget(QWidget *parant) {
     display->setClearColor(red);
     leftLayout->addWidget(display);
 
+    oclDisplay = new ImageWidget(this);
+    rightlayout->addWidget(oclDisplay);
     setLayout(mainlayout);
 
+    connect(display,&OglWidget::displayChanged,this,&OglExampleWidget::updateOclWidget);
 }
 
 void OglExampleWidget::openMesh() {
@@ -61,5 +64,16 @@ void OglExampleWidget::openMesh() {
 //        //meshloader->load((char*)(fileName.toStdString().c_str()));
 //        display->loadModel(meshloader);
 
+    }
+}
+
+void OglExampleWidget::updateOclWidget(QImage *image) {
+    if(oclDisplay!= nullptr)
+    {
+        oclDisplay->clearImage();
+        QImage* processedimage = imageFilter->filterImage(image);
+
+        oclDisplay->setImage(processedimage);
+        oclDisplay->repaint();
     }
 }

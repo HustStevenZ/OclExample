@@ -17,7 +17,13 @@ public:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
     void setImage(QImage *image){this->image = image;}
-    void clearImage(){this->image = Q_NULLPTR;}
+    void clearImage(){
+        if(this->image!=Q_NULLPTR)
+        {
+            delete this->image;
+            this->image = Q_NULLPTR;
+        }
+    }
 private:
     QImage* image = Q_NULLPTR;
 

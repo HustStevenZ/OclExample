@@ -34,6 +34,7 @@ public:
 
 signals:
     void clicked();
+    void displayChanged(QImage* image);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -50,6 +51,7 @@ private:
     void setVertices(aiScene* scene);
     void setTextures(aiScene* scene);
 
+    void updateParent();
 
     void reinitVbo();
 
