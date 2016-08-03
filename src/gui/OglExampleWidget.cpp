@@ -67,11 +67,13 @@ void OglExampleWidget::openMesh() {
     }
 }
 
+
+
 void OglExampleWidget::updateOclWidget(QImage *image) {
     if(oclDisplay!= nullptr)
     {
         oclDisplay->clearImage();
-        QImage* processedimage = imageFilter->filterImage(image);
+        QImage* processedimage = imageFilter->blurImage(image);
 
         oclDisplay->setImage(processedimage);
         oclDisplay->repaint();

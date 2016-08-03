@@ -44,6 +44,7 @@ void ImageFilterExampleWidget::createMenu()
    menuBar = new QMenuBar(this);
     menuBar->setVisible(true);
     QMenu *_2dMenu = menuBar->addMenu(tr("&File"));
+    QMenu *_FilterMenu = menuBar->addMenu(tr("&Filter"));
 //    QMenu *_filterMenu = menuBar->addMenu(tr("&Image Filter"));
 //    menuBar->setFixedSize(820,20);
     menuBar->setEnabled(true);
@@ -52,9 +53,37 @@ void ImageFilterExampleWidget::createMenu()
     _2dMenu->addAction(openAction);
     connect(openAction,&QAction::triggered,this,&ImageFilterExampleWidget::open);
 
+    QAction *blurAction = new QAction(tr("&Blur"),_FilterMenu);
+    _FilterMenu->addAction(blurAction);
+
+    connect(blurAction,&QAction::triggered,this,&ImageFilterExampleWidget::blurImage);
+
+    QAction *sharpAction = new QAction(tr("&Sharping"),_FilterMenu);
+    _FilterMenu->addAction(sharpAction);
+
+    connect(sharpAction,&QAction::triggered,this,&ImageFilterExampleWidget::sharpingImage);
+
+    QAction *embossAction = new QAction(tr("&Embossing"),_FilterMenu);
+    _FilterMenu->addAction(embossAction);
+
+    connect(embossAction,&QAction::triggered,this,&ImageFilterExampleWidget::embossinImage);
 
 }
 
+void ImageFilterExampleWidget::sharpingImage() {
+    curFilter = SHARPING;
+    processImages();
+}
+
+void ImageFilterExampleWidget::blurImage() {
+    curFilter = BLUR;
+    processImages();
+}
+
+void ImageFilterExampleWidget::embossinImage() {
+    curFilter = EMBOSSING;
+    processImages();
+}
 void ImageFilterExampleWidget::open() {
 //    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
 
@@ -86,11 +115,28 @@ void ImageFilterExampleWidget::open() {
 void ImageFilterExampleWidget::processImages() {
     if(isFileValid()) {
 //        setWindowTitle(QString::fromStdString(this->imageFilter->testHelloWorld()));
-        QImage* image = imageFilter->filterImage(new QImage(objPath));
 
-        afterW->setFixedSize(400,image->height()*400/image->width());
-        afterW->setImage(image);
-        afterW->repaint();
+        QImage* image = nullptr;
+        switch(curFilter)
+        {
+            case BLUR:
+                image=imageFilter->blurImage(new QImage(objPath));
+                break;
+            case SHARPING:
+                image=imageFilter->sharpingImage(new QImage(objPath));
+                break;
+            case EMBOSSING:
+                image=imageFilter->embossingImage(new QImage(objPath));
+                break;
+            default:
+                break;
+        }
+
+        if(image!= nullptr)
+        {
+            afterW->setFixedSize(400,image->height()*400/image->width());
+            afterW->setImage(image);
+            afterW->repaint();}
 //    }
     }
 }

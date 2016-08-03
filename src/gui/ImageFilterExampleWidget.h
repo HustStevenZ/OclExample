@@ -13,6 +13,11 @@ class ImageFilterExampleWidget: public QWidget {
 Q_OBJECT
 
 public:
+    enum FilterActions{
+        BLUR,
+        SHARPING,
+        EMBOSSING
+    };
     ImageFilterExampleWidget(QWidget* parent = Q_NULLPTR);
 
     ~ImageFilterExampleWidget(){
@@ -24,6 +29,9 @@ public:
 private:
     void createMenu();
     void processImages();
+    void blurImage();
+    void sharpingImage();
+    void embossinImage();
     bool isFileValid(){ return  !objPath.isEmpty()&&(objPath.endsWith(".jpg")
                                                      || objPath.endsWith(".png")
                                                      || objPath.endsWith(".jpeg"));};
@@ -38,7 +46,7 @@ private:
     QString objPath = "";
     ImageWidget* beforeW;
     ImageWidget* afterW;
-
+    FilterActions curFilter = BLUR;
     //OGL Data
 
     //Image Filter

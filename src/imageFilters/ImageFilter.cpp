@@ -34,6 +34,7 @@ std::string imageFilterKernel="\n"
         "      int2 rightDownCord = (int2)(coord.x+1,coord.y+1);\n"
         "\n"
         "      //BOUNARY\n"
+        "      //Treat column[0]=column1,clumn[width+1]=column[width] etc\n"
         "      if(coord.x==1)\n"
         "      {\n"
         "        leftupCord.x=1;\n"
@@ -68,19 +69,38 @@ std::string imageFilterKernel="\n"
         "      uint4 pdown = read_imageui(input,sampler,downCord);\n"
         "      uint4 prightdown = read_imageui(input,sampler,rightDownCord);\n"
         "\n"
-        "     float filtersum= 0;\n"
-        "      for(int i = 0;i<9;i++)\n"
-        "      {\n"
-        "        filtersum = filtersum+filter[i];\n"
-        "      }\n"
+        "\n"
         "       uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+\n"
         "                           convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+\n"
-        "                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8])/filtersum);\n"
-        " \n"
+        "                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8]));\n"
+        "\n"
         "      write_imageui(output,coord,resultpixelf);\n"
         "    }";
 
-QImage* ImageFilter::filterImage(QImage *image) {
+QImage* ImageFilter::blurImage(QImage *image)  {
+
+    float filter[9]={
+            1.0/16.0,2.0/16.0,1.0/16.0,
+            2.0f/16.0, 4.0f/16.0,2.0f/16.0,
+            1.0f/16.0,2.0f/16.0,1.0f/16.0};
+    return filterImage3x3(image,filter);
+}
+
+QImage* ImageFilter::sharpingImage(QImage *image) {
+    float filter[9]={-1.0,-1.0,-1.0,
+                     -1.0,9.0,-1.0,
+                     -1.0,-1.0,-1.0};
+    return filterImage3x3(image,filter);
+}
+
+QImage* ImageFilter::embossingImage(QImage *image) {
+
+    float filter[9]={-1.0f,-0.5f,-0.0f,
+                     -0.5f,0.5f,0.5f,
+                     0.0f,0.5f,1.0f};
+    return filterImage3x3(image,filter);
+}
+QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
 
 
 //    clSource source("cl/imageFilters/programes/imageFilter.cl");
@@ -92,10 +112,6 @@ QImage* ImageFilter::filterImage(QImage *image) {
     rgb_format.image_channel_order = CL_RGBA;
     rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
 
-    float filter[9]={
-            1.0,1.0,1.0,
-            1.0f, 1.0f,1.0f,
-            1.0f,1.0f,1.0f};
     OclImage *inputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
     OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
 
@@ -124,8 +140,12 @@ QImage* ImageFilter::filterImage(QImage *image) {
     oclKernel->setKernelArgBuffer(1,outputBuffer);
     oclKernel->setKernelArgBuffer(2,filterBuffer);
 
-    size_t work_size[]= {(size_t)image->width(),(size_t)image->height()};
-    _context->enqueueKernel(oclKernel,2,NULL,work_size,NULL);
+    size_t local_w = 3;
+    size_t local_h = 3;
+    size_t work_size[]= {((size_t)image->width()/local_w)*local_w,((size_t)image->height()/local_h)*local_h};
+    size_t local_size[]={local_w,local_h};
+    size_t offset_size[]={work_size[0]%local_w,work_size[1]%local_h};
+    _context->enqueueKernel(oclKernel,2,offset_size,work_size,local_size);
 
     _context->flush();
     unsigned int* buffer = new unsigned int[image->width()*image->height()];

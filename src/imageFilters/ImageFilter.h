@@ -23,7 +23,11 @@ public:
     /**
      * TODO: Perhaps we may have time to isolate ImageFilter from QImage in the future
      */
-    QImage* filterImage(QImage* image);
+    QImage* blurImage(QImage* image);
+
+    QImage* sharpingImage(QImage* image);
+    QImage* embossingImage(QImage* image);
+    QImage* filterImage3x3(QImage* image,const float filter[]);
 
     std::string testHelloWorld();
 private:

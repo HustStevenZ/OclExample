@@ -56,14 +56,10 @@ __kernel void image_filter( __read_only image2d_t input, __write_only image2d_t 
       uint4 pdown = read_imageui(input,sampler,downCord);
       uint4 prightdown = read_imageui(input,sampler,rightDownCord);
 
-     float filtersum= 0;
-      for(int i = 0;i<9;i++)
-      {
-        filtersum = filtersum+filter[i];
-      }
+
        uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+
                            convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+
-                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8])/filtersum);
+                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8]));
 
       write_imageui(output,coord,resultpixelf);
     }
