@@ -14,7 +14,6 @@
 #include <objLoader.h>
 #include <glm.h>
 #include <assimp/scene.h>
-
 class OglWidget : public QOpenGLWidget, protected QOpenGLFunctions{
 
 Q_OBJECT
@@ -45,29 +44,54 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
+
+
+    struct OglMeshInfo{
+        QVector<GLfloat> verticeData;
+        QMap<int,QOpenGLTexture*> textures;
+        QMatrix4x4 transform;
+    };
+
     void makeObject();
     void setVertices(objLoader* objInfo);
     void setVertices(GLMmodel* objInfo);
-    void setVertices(aiScene* scene);
-    void setTextures(aiScene* scene);
 
     void updateParent();
 
     void reinitVbo();
+    void reinitVbo(QVector<GLfloat>& vertices);
+    void drawSingle();
+    void drawSingle(QMatrix4x4& transformation);
+    void drawMesh(OglMeshInfo* mesh);
 
+    void drawAssimpScene();
+    void drawAssimpNode(aiNode* node,aiMatrix4x4 transform);
+    void drawAssimpMesh(aiMesh* mesh,aiMatrix4x4& transformation);
+
+    void prepareScene();
+    void prepareNodes(aiNode* node,aiMatrix4x4 transform);
+    void prepareMesh(aiMesh* mesh,aiMatrix4x4& transformation);
+
+    void releaseMesh();
     QColor clearColor;
     QPoint lastPos;
     int xRot;
     int yRot;
     int zRot;
     bool doPaint = false;
+    bool useAssImpScene = false;
+    aiScene* scene = nullptr;
+
+
     QVector<GLfloat> verticeData;
+    QMap<int,QOpenGLTexture*> textures;
+
+    QVector<OglMeshInfo*> meshVec;
     QOpenGLShaderProgram *program;
     QOpenGLShader* vshader;
     QOpenGLShader* fshader;
     QOpenGLBuffer vbo;
     QOpenGLBuffer ibo;
-    QMap<int,QOpenGLTexture*> textures;
     QString modelFilePath;
 //    QOpenGLTexture* textures;
 
