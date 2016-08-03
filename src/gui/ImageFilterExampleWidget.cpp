@@ -56,8 +56,21 @@ void ImageFilterExampleWidget::createMenu()
 }
 
 void ImageFilterExampleWidget::open() {
-    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
+//    this->objPath=QFileDialog::getOpenFileName(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
 
+    this->objPath = "";
+    QStringList filenames;
+    QFileDialog* fileDialog= new QFileDialog(this,"Open Image File",QDir::homePath(),"Image files (*.png *.jpg *.jpeg)");
+    if(fileDialog->exec())
+    {
+        filenames = fileDialog->selectedFiles();
+        fileDialog->hide();
+        delete fileDialog;
+    }
+    if(!filenames.isEmpty())
+    {
+        this->objPath = filenames[0];
+    }
     if(!isFileValid())
         this->objPath="";
     if(isFileValid())
