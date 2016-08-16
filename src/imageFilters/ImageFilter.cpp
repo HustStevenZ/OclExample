@@ -140,8 +140,8 @@ QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
     oclKernel->setKernelArgBuffer(1,outputBuffer);
     oclKernel->setKernelArgBuffer(2,filterBuffer);
 
-    size_t local_w = 3;
-    size_t local_h = 3;
+    size_t local_w = 16;
+    size_t local_h = 16;
     size_t work_size[]= {((size_t)image->width()/local_w)*local_w,((size_t)image->height()/local_h)*local_h};
     size_t local_size[]={local_w,local_h};
     size_t offset_size[]={work_size[0]%local_w,work_size[1]%local_h};

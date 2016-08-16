@@ -94,6 +94,7 @@ void ImageFilterExampleWidget::open() {
     {
         filenames = fileDialog->selectedFiles();
         fileDialog->hide();
+        fileDialog->setHidden(true);
         delete fileDialog;
     }
     if(!filenames.isEmpty())
