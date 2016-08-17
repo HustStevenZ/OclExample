@@ -8,10 +8,10 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
-#include "objLoader.h"
+//#include "objLoader.h"
 #include "OglWidget.h"
 #include "ImageWidget.h"
-#include <glm.h>
+//#include <glm.h>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

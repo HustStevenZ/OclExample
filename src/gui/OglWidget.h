@@ -11,8 +11,8 @@
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
-#include <objLoader.h>
-#include <glm.h>
+//#include <objLoader.h>
+//#include <glm.h>
 #include <assimp/scene.h>
 class OglWidget : public QOpenGLWidget, protected QOpenGLFunctions{
 
@@ -26,8 +26,8 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     void rotateBy(int xAngle, int yAngle, int zAngle);
     void setClearColor(const QColor &color);
-    void loadModel(objLoader* loader);
-    void loadModel(GLMmodel* model);
+//    void loadModel(objLoader* loader);
+//    void loadModel(GLMmodel* model);
     void loadModel(aiScene* scene);
     void loadModel(QString filePath);
 
@@ -53,8 +53,8 @@ private:
     };
 
     void makeObject();
-    void setVertices(objLoader* objInfo);
-    void setVertices(GLMmodel* objInfo);
+//    void setVertices(objLoader* objInfo);
+//    void setVertices(GLMmodel* objInfo);
 
     void updateParent();
 

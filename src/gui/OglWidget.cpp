@@ -8,7 +8,9 @@
 #include <iostream>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
-
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#endif
 OglWidget::OglWidget(QWidget *parent)
         : QOpenGLWidget(parent),
           clearColor(Qt::black),
@@ -427,138 +429,138 @@ void OglWidget::makeObject()
 
 }
 
-void OglWidget::setVertices(objLoader *objInfo) {
-    if(objInfo!= nullptr) {
-        verticeData.clear();
-        int vertextCount = objInfo->vertexCount;
-        QVector<GLfloat> tempvertData;
-        QVector<GLfloat> normData;
-        QVector<GLint> indiceData;
-        QVector<GLint> normIndex;
-        for (int i = 0; i < vertextCount; i++) {
-            tempvertData.append((objInfo->vertexList[i])->e[0]);
-            tempvertData.append((objInfo->vertexList[i])->e[1]);
-            tempvertData.append((objInfo->vertexList[i])->e[2]);
-        }
-        for (int i = 0; i < objInfo->normalCount; i++)
-        {
-            normData.push_back(objInfo->normalList[i]->e[0]);
-            normData.push_back(objInfo->normalList[i]->e[1]);
-            normData.push_back(objInfo->normalList[i]->e[2]);
-        }
-        for(int i = 0;i<objInfo->faceCount;i++)
-        {
-            obj_face* face = objInfo->faceList[i];
-
-            for(int j = 0;j<face->vertex_count;j++)
-            {
-
-                indiceData.append(face->vertex_index[j]);
-            }
-        }
-
-        for(int i = 0;i<objInfo->faceCount;i++)
-        {
-            obj_face* face = objInfo->faceList[i];
-
-            for(int j = 0;j<face->vertex_count;j++)
-            {
-                normIndex.append(face->normal_index[j]);
-            }
-        }
-        for(int i = 0;i<indiceData.size();i++)
-        {
-            verticeData.push_back(tempvertData[indiceData[i]*3]);
-            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
-            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
-
-            if(objInfo->normalCount>0)
-            {
-
-            verticeData.push_back(normData[normIndex[i]*3]);
-            verticeData.push_back(normData[normIndex[i]*3+1]);
-            verticeData.push_back(normData[normIndex[i]*3+2]);
-            }
-            else
-            {
-                verticeData.push_back(1.0f);
-                verticeData.push_back(0.0f);
-                verticeData.push_back(0.0f);
-            }
-
+//void OglWidget::setVertices(objLoader *objInfo) {
+//    if(objInfo!= nullptr) {
+//        verticeData.clear();
+//        int vertextCount = objInfo->vertexCount;
+//        QVector<GLfloat> tempvertData;
+//        QVector<GLfloat> normData;
+//        QVector<GLint> indiceData;
+//        QVector<GLint> normIndex;
+//        for (int i = 0; i < vertextCount; i++) {
+//            tempvertData.append((objInfo->vertexList[i])->e[0]);
+//            tempvertData.append((objInfo->vertexList[i])->e[1]);
+//            tempvertData.append((objInfo->vertexList[i])->e[2]);
+//        }
+//        for (int i = 0; i < objInfo->normalCount; i++)
+//        {
+//            normData.push_back(objInfo->normalList[i]->e[0]);
+//            normData.push_back(objInfo->normalList[i]->e[1]);
+//            normData.push_back(objInfo->normalList[i]->e[2]);
+//        }
+//        for(int i = 0;i<objInfo->faceCount;i++)
+//        {
+//            obj_face* face = objInfo->faceList[i];
 //
-        }
-    }
-}
-
-void OglWidget::setVertices(GLMmodel *objInfo) {
-    if(objInfo!= nullptr) {
-        verticeData.clear();
-        int vertextCount = objInfo->numvertices;
-        QVector<GLfloat> tempvertData;
-        QVector<GLfloat> normData;
-        QVector<GLint> indiceData;
-        QVector<GLint> normIndex;
-        for (int i = 0; i < vertextCount; i++) {
-            tempvertData.append((objInfo->vertices[i*3]));
-            tempvertData.append((objInfo->vertices[i*3+1]));
-            tempvertData.append((objInfo->vertices[i*3+1]));
-        }
-        for (int i = 0; i < objInfo->numnormals; i++)
-        {
-            normData.push_back(objInfo->normals[i*3]);
-            normData.push_back(objInfo->normals[i*3+1]);
-            normData.push_back(objInfo->normals[i*3+2]);
-        }
-        for(int i = 0;i<objInfo->numtriangles;i++)
-        {
-            GLMtriangle* face = objInfo->triangles+i;
-            indiceData.append(face->vindices[0]);
-            indiceData.append(face->vindices[1]);
-            indiceData.append(face->vindices[2]);
-
-            normIndex.append(face->nindices[0]);
-            normIndex.append(face->nindices[1]);
-            normIndex.append(face->nindices[2]);
-        }
-
-        for(int i = 0;i<indiceData.size();i++)
-        {
-            verticeData.push_back(tempvertData[indiceData[i]*3]);
-            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
-            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
-
-            if(objInfo->numnormals>0)
-            {
-
-                verticeData.push_back(normData[normIndex[i]*3]);
-                verticeData.push_back(normData[normIndex[i]*3+1]);
-                verticeData.push_back(normData[normIndex[i]*3+2]);
-            }
-            else
-            {
-                verticeData.push_back(1.0f);
-                verticeData.push_back(0.0f);
-                verticeData.push_back(0.0f);
-            }
-
+//            for(int j = 0;j<face->vertex_count;j++)
+//            {
 //
-        }
-    }
-}
-
-
-void OglWidget::loadModel(objLoader *loader) {
-    setVertices(loader);
-    doPaint = true;
-    update();
-}
-
-void OglWidget::loadModel(GLMmodel *model) {
-    setVertices(model);
-    doPaint = true;
-    update();
-}
+//                indiceData.append(face->vertex_index[j]);
+//            }
+//        }
+//
+//        for(int i = 0;i<objInfo->faceCount;i++)
+//        {
+//            obj_face* face = objInfo->faceList[i];
+//
+//            for(int j = 0;j<face->vertex_count;j++)
+//            {
+//                normIndex.append(face->normal_index[j]);
+//            }
+//        }
+//        for(int i = 0;i<indiceData.size();i++)
+//        {
+//            verticeData.push_back(tempvertData[indiceData[i]*3]);
+//            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
+//            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
+//
+//            if(objInfo->normalCount>0)
+//            {
+//
+//            verticeData.push_back(normData[normIndex[i]*3]);
+//            verticeData.push_back(normData[normIndex[i]*3+1]);
+//            verticeData.push_back(normData[normIndex[i]*3+2]);
+//            }
+//            else
+//            {
+//                verticeData.push_back(1.0f);
+//                verticeData.push_back(0.0f);
+//                verticeData.push_back(0.0f);
+//            }
+//
+////
+//        }
+//    }
+//}
+//
+//void OglWidget::setVertices(GLMmodel *objInfo) {
+//    if(objInfo!= nullptr) {
+//        verticeData.clear();
+//        int vertextCount = objInfo->numvertices;
+//        QVector<GLfloat> tempvertData;
+//        QVector<GLfloat> normData;
+//        QVector<GLint> indiceData;
+//        QVector<GLint> normIndex;
+//        for (int i = 0; i < vertextCount; i++) {
+//            tempvertData.append((objInfo->vertices[i*3]));
+//            tempvertData.append((objInfo->vertices[i*3+1]));
+//            tempvertData.append((objInfo->vertices[i*3+1]));
+//        }
+//        for (int i = 0; i < objInfo->numnormals; i++)
+//        {
+//            normData.push_back(objInfo->normals[i*3]);
+//            normData.push_back(objInfo->normals[i*3+1]);
+//            normData.push_back(objInfo->normals[i*3+2]);
+//        }
+//        for(int i = 0;i<objInfo->numtriangles;i++)
+//        {
+//            GLMtriangle* face = objInfo->triangles+i;
+//            indiceData.append(face->vindices[0]);
+//            indiceData.append(face->vindices[1]);
+//            indiceData.append(face->vindices[2]);
+//
+//            normIndex.append(face->nindices[0]);
+//            normIndex.append(face->nindices[1]);
+//            normIndex.append(face->nindices[2]);
+//        }
+//
+//        for(int i = 0;i<indiceData.size();i++)
+//        {
+//            verticeData.push_back(tempvertData[indiceData[i]*3]);
+//            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
+//            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
+//
+//            if(objInfo->numnormals>0)
+//            {
+//
+//                verticeData.push_back(normData[normIndex[i]*3]);
+//                verticeData.push_back(normData[normIndex[i]*3+1]);
+//                verticeData.push_back(normData[normIndex[i]*3+2]);
+//            }
+//            else
+//            {
+//                verticeData.push_back(1.0f);
+//                verticeData.push_back(0.0f);
+//                verticeData.push_back(0.0f);
+//            }
+//
+////
+//        }
+//    }
+//}
+//
+//
+//void OglWidget::loadModel(objLoader *loader) {
+//    setVertices(loader);
+//    doPaint = true;
+//    update();
+//}
+//
+//void OglWidget::loadModel(GLMmodel *model) {
+//    setVertices(model);
+//    doPaint = true;
+//    update();
+//}
 
 void OglWidget::loadModel(aiScene *scene) {
 //    setVertices(scene);
