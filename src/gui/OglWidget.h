@@ -33,7 +33,9 @@ public:
 
 signals:
     void clicked();
-    void displayChanged(QImage* image);
+    void displayChanged(GLuint textureobj,int width,int height);
+    void displayChanged(QOpenGLTexture* texture);
+    void displayChanged(QImage* texture);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -94,7 +96,9 @@ private:
     QOpenGLBuffer ibo;
     QString modelFilePath;
 //    QOpenGLTexture* textures;
-
+//    QOpenGLTexture* renderedTexture = nullptr;
+    GLuint  renderTexId = -1;
+    GLuint frameBufferName = -1;
 };
 
 

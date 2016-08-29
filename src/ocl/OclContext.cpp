@@ -5,6 +5,9 @@
 #include "OclContext.h"
 #include "OclErrors.h"
 #include "OclProgram.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#endif
 OclContext::OclContext(cl_context context) {
     _context=context;
 
@@ -166,4 +169,19 @@ void OclContext::mapReadBuffer(OclBuffer *buffer, unsigned int size, char *hostM
             *(hostMeme+i)=*(data+i);
     }
 
+}
+
+OclImage* OclContext::createImage2DFromGLTex(OclBuffer::BufferMode mode, int level, GLuint texObj) {
+    cl_int errCode = 0;
+//    glBindTexture(GL_TEXTURE_2D,texObj);
+    cl_mem clMem = clCreateFromGLTexture(_context,OclBuffer::translateBufferModeToFlags(mode),GL_TEXTURE_2D,level,texObj,&errCode);
+//    cl_mem clMem= clCreateImage2D(_context,OclBuffer::translateBufferModeToFlags(mode),format,width,height,row_pitch,data,&errCode);
+    OclErrors::CheckError(errCode,"OclContext::createImage2D");
+
+    if(OclErrors::success(errCode))
+    {
+        OclImage* image = new OclImage(clMem);
+        return image;
+    }
+    return nullptr;
 }

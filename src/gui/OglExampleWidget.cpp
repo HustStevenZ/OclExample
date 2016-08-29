@@ -44,7 +44,11 @@ OglExampleWidget::OglExampleWidget(QWidget *parant) {
     rightlayout->addWidget(oclDisplay);
     setLayout(mainlayout);
 
-    connect(display,&OglWidget::displayChanged,this,&OglExampleWidget::updateOclWidget);
+//    connect(display,&OglWidget::displayChanged,this,&OglExampleWidget::updateOclWidget);
+
+    connect(display,SIGNAL(displayChanged(QOpenGLTexture*)),this,SLOT(updateOclWidget(QOpenGLTexture*)));
+    connect(display,SIGNAL(displayChanged(GLuint,int,int)),this,SLOT(updateOclWidget(GLuint,int,int)));
+    connect(display,SIGNAL(displayChanged(QImage*)),this,SLOT(updateOclWidget(QImage*)));
 }
 
 void OglExampleWidget::openMesh() {
@@ -69,11 +73,46 @@ void OglExampleWidget::openMesh() {
 
 
 
-void OglExampleWidget::updateOclWidget(QImage *image) {
+void OglExampleWidget::updateOclWidget(GLuint textureObj,int width,int height) {
+    if(imageFilter== nullptr)
+        imageFilter= new ImageFilter();
     if(oclDisplay!= nullptr)
     {
         oclDisplay->clearImage();
-        QImage* processedimage = imageFilter->blurImage(image);
+        QImage* processedimage = imageFilter->blurImage(textureObj,width,height);
+
+        oclDisplay->setImage(processedimage);
+        oclDisplay->repaint();
+    }
+}
+
+void OglExampleWidget::updateOclWidget(QImage *textureObj) {
+    if(imageFilter== nullptr)
+        imageFilter= new ImageFilter();
+
+    if(oclDisplay!= nullptr)
+    {
+        oclDisplay->clearImage();
+        QImage* processedimage = imageFilter->blurImage(textureObj);
+
+        oclDisplay->setImage(processedimage);
+        oclDisplay->repaint();
+    }
+}
+
+void OglExampleWidget::updateOclWidget(QOpenGLTexture *textureObj) {
+    if(imageFilter== nullptr)
+        imageFilter= new ImageFilter();
+    int width = 0;
+
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+
+    if(glGetError()==GL_INVALID_ENUM)
+        return;
+    if(oclDisplay!= nullptr)
+    {
+        oclDisplay->clearImage();
+        QImage* processedimage = imageFilter->blurImage(textureObj);
 
         oclDisplay->setImage(processedimage);
         oclDisplay->repaint();

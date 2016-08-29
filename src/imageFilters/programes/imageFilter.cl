@@ -57,6 +57,21 @@ __kernel void image_filter( __read_only image2d_t input, __write_only image2d_t 
       uint4 prightdown = read_imageui(input,sampler,rightDownCord);
 
 
+            if(get_image_channel_data_type(input) == CLK_UNORM_INT8)
+            {
+              uint4 pixel = convert_uint4(read_imagef(input,sampler,coord)*255);
+              uint4 pleftup = convert_uint4(read_imagef(input,sampler,leftupCord)*255);
+              uint4 pup = convert_uint4(read_imagef(input,sampler,upCord)*255);
+              uint4 prightup = convert_uint4(read_imagef(input,sampler,rightupCord)*255);
+              uint4 pleft = convert_uint4(read_imagef(input,sampler,leftCord)*255);
+              uint4 pright = convert_uint4(read_imagef(input,sampler,rightCord)*255);
+              uint4 pleftdown = convert_uint4(read_imagef(input,sampler,leftDowCord)*255);
+              uint4 pdown = convert_uint4(read_imagef(input,sampler,downCord)*255);
+              uint4 prightdown = convert_uint4(read_imagef(input,sampler,rightDownCord)*255);
+
+            }
+
+
        uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+
                            convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+
                            convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8]));

@@ -27,6 +27,8 @@ public:
 
     OclBuffer* createBuffer(int size,OclBuffer::BufferMode mode,char* host_ptr);
     OclImage* createImage2D(OclBuffer::BufferMode mode,const cl_image_format *format, size_t width, size_t height, size_t row_pitch, void *data);
+
+    OclImage* createImage2DFromGLTex(OclBuffer::BufferMode mode,int level,GLuint texObj);
     OclImage* createImage3D(OclBuffer::BufferMode mode,const cl_image_format *format, size_t width, size_t height,
                             size_t depth, size_t row_pitch, size_t slice_pitch, void *data);
 

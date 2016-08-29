@@ -31,7 +31,9 @@ signals:
     void oglWidgetChanged(QImage* image);
 
 public Q_SLOTS:
-    void updateOclWidget(QImage* image);
+    void updateOclWidget(GLuint textureObj,int width,int height);
+    void updateOclWidget(QOpenGLTexture* textureObj);
+    void updateOclWidget(QImage* textureObj);
 private:
     void openMesh();
     OglWidget* display = nullptr;
@@ -41,7 +43,7 @@ private:
     aiScene *scene = nullptr;
 
     //Image Filter
-    ImageFilter* imageFilter = new ImageFilter();
+    ImageFilter* imageFilter = nullptr;
 };
 
 

@@ -8,6 +8,7 @@
 
 #include <src/ocl/OclEngine.h>
 #include <QImage>
+#include <QOpenGLTexture>
 
 class ImageFilter {
 
@@ -29,10 +30,26 @@ public:
     QImage* embossingImage(QImage* image);
     QImage* filterImage3x3(QImage* image,const float filter[]);
 
+
+    QImage* blurImage(GLuint textureObj,int width,int height);
+
+    QImage* sharpingImage(GLuint textureObj,int width,int height);
+    QImage* embossingImage(GLuint textureObj,int width,int height);
+    QImage* filterImage3x3(GLuint textureObj,const float filter[],int width,int height);
+
+
+    QImage* blurImage(QOpenGLTexture* textureObj);
+
+    QImage* sharpingImage(QOpenGLTexture*  textureObj);
+    QImage* embossingImage(QOpenGLTexture*  textureObj);
+    QImage* filterImage3x3(QOpenGLTexture*  textureObj,const float filter[]);
     std::string testHelloWorld();
 private:
-    OclContext* _context = OclEngine::getEngine()->createContext();
+    OclContext* _context = OclEngine::getEngine()->createContext(true);
 
+    OclProgram* _program = nullptr;
+
+    OclKernel* _kernel = nullptr;
 
 };
 

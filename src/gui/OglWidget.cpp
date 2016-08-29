@@ -10,6 +10,8 @@
 #include <assimp/postprocess.h>
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
+#include <QPainter>
+
 #endif
 OglWidget::OglWidget(QWidget *parent)
         : QOpenGLWidget(parent),
@@ -76,6 +78,16 @@ void OglWidget::initializeGL()
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
+
+    GLuint FramebufferName = 0;
+
+    glGenFramebuffers(1, &frameBufferName);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferName);
+
+
+    glGenTextures(1,&renderTexId);
+
 #define PROGRAM_VERTEX_ATTRIBUTE 0
 #define PROGRAM_NORMAL_ATTRIBUTE 1
 #define PROGRAM_TEXCOORD_ATTRIBUTE 2
@@ -114,7 +126,19 @@ void OglWidget::initializeGL()
 void OglWidget::drawMesh(OglMeshInfo *mesh) {
     if(mesh!= nullptr)
     {
+        int width = 0;
+        int height = 0;
+        glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_WIDTH,&width);
+        glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_HEIGHT,&height);
 
+
+        glBindTexture(GL_TEXTURE_2D,renderTexId);
+//        glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA8UI, width, height, 0,GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+        glBindTexture(GL_TEXTURE_2D,0);
+
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderTexId, 0);
         QMatrix4x4 transformation = mesh->transform;
 //        QMap<int,QOpenGLTexture*>& textures = mesh->textures;
         QVector<GLfloat> &verticeData = mesh->verticeData;
@@ -151,6 +175,9 @@ void OglWidget::drawMesh(OglMeshInfo *mesh) {
             }
         }
 
+//        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture->textureId(), 0);
+
+//        renderedTexture->bind();
         glDrawArrays(GL_TRIANGLES, 0, verticeData.size()/8);
     }
 }
@@ -429,139 +456,6 @@ void OglWidget::makeObject()
 
 }
 
-//void OglWidget::setVertices(objLoader *objInfo) {
-//    if(objInfo!= nullptr) {
-//        verticeData.clear();
-//        int vertextCount = objInfo->vertexCount;
-//        QVector<GLfloat> tempvertData;
-//        QVector<GLfloat> normData;
-//        QVector<GLint> indiceData;
-//        QVector<GLint> normIndex;
-//        for (int i = 0; i < vertextCount; i++) {
-//            tempvertData.append((objInfo->vertexList[i])->e[0]);
-//            tempvertData.append((objInfo->vertexList[i])->e[1]);
-//            tempvertData.append((objInfo->vertexList[i])->e[2]);
-//        }
-//        for (int i = 0; i < objInfo->normalCount; i++)
-//        {
-//            normData.push_back(objInfo->normalList[i]->e[0]);
-//            normData.push_back(objInfo->normalList[i]->e[1]);
-//            normData.push_back(objInfo->normalList[i]->e[2]);
-//        }
-//        for(int i = 0;i<objInfo->faceCount;i++)
-//        {
-//            obj_face* face = objInfo->faceList[i];
-//
-//            for(int j = 0;j<face->vertex_count;j++)
-//            {
-//
-//                indiceData.append(face->vertex_index[j]);
-//            }
-//        }
-//
-//        for(int i = 0;i<objInfo->faceCount;i++)
-//        {
-//            obj_face* face = objInfo->faceList[i];
-//
-//            for(int j = 0;j<face->vertex_count;j++)
-//            {
-//                normIndex.append(face->normal_index[j]);
-//            }
-//        }
-//        for(int i = 0;i<indiceData.size();i++)
-//        {
-//            verticeData.push_back(tempvertData[indiceData[i]*3]);
-//            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
-//            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
-//
-//            if(objInfo->normalCount>0)
-//            {
-//
-//            verticeData.push_back(normData[normIndex[i]*3]);
-//            verticeData.push_back(normData[normIndex[i]*3+1]);
-//            verticeData.push_back(normData[normIndex[i]*3+2]);
-//            }
-//            else
-//            {
-//                verticeData.push_back(1.0f);
-//                verticeData.push_back(0.0f);
-//                verticeData.push_back(0.0f);
-//            }
-//
-////
-//        }
-//    }
-//}
-//
-//void OglWidget::setVertices(GLMmodel *objInfo) {
-//    if(objInfo!= nullptr) {
-//        verticeData.clear();
-//        int vertextCount = objInfo->numvertices;
-//        QVector<GLfloat> tempvertData;
-//        QVector<GLfloat> normData;
-//        QVector<GLint> indiceData;
-//        QVector<GLint> normIndex;
-//        for (int i = 0; i < vertextCount; i++) {
-//            tempvertData.append((objInfo->vertices[i*3]));
-//            tempvertData.append((objInfo->vertices[i*3+1]));
-//            tempvertData.append((objInfo->vertices[i*3+1]));
-//        }
-//        for (int i = 0; i < objInfo->numnormals; i++)
-//        {
-//            normData.push_back(objInfo->normals[i*3]);
-//            normData.push_back(objInfo->normals[i*3+1]);
-//            normData.push_back(objInfo->normals[i*3+2]);
-//        }
-//        for(int i = 0;i<objInfo->numtriangles;i++)
-//        {
-//            GLMtriangle* face = objInfo->triangles+i;
-//            indiceData.append(face->vindices[0]);
-//            indiceData.append(face->vindices[1]);
-//            indiceData.append(face->vindices[2]);
-//
-//            normIndex.append(face->nindices[0]);
-//            normIndex.append(face->nindices[1]);
-//            normIndex.append(face->nindices[2]);
-//        }
-//
-//        for(int i = 0;i<indiceData.size();i++)
-//        {
-//            verticeData.push_back(tempvertData[indiceData[i]*3]);
-//            verticeData.push_back(tempvertData[indiceData[i]*3+1]);
-//            verticeData.push_back(tempvertData[indiceData[i]*3+2]);
-//
-//            if(objInfo->numnormals>0)
-//            {
-//
-//                verticeData.push_back(normData[normIndex[i]*3]);
-//                verticeData.push_back(normData[normIndex[i]*3+1]);
-//                verticeData.push_back(normData[normIndex[i]*3+2]);
-//            }
-//            else
-//            {
-//                verticeData.push_back(1.0f);
-//                verticeData.push_back(0.0f);
-//                verticeData.push_back(0.0f);
-//            }
-//
-////
-//        }
-//    }
-//}
-//
-//
-//void OglWidget::loadModel(objLoader *loader) {
-//    setVertices(loader);
-//    doPaint = true;
-//    update();
-//}
-//
-//void OglWidget::loadModel(GLMmodel *model) {
-//    setVertices(model);
-//    doPaint = true;
-//    update();
-//}
-
 void OglWidget::loadModel(aiScene *scene) {
 //    setVertices(scene);
 //    setTextures(scene);
@@ -733,12 +627,34 @@ void OglWidget::loadModel(QString filePath) {
 
 void OglWidget::updateParent() {
 
-    int width = 0;
-    int height = 0;
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_WIDTH,&width);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_HEIGHT,&height);
-    unsigned int* buffer = (unsigned int*)malloc(sizeof(unsigned int)*width*height);
-    glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_INT_8_8_8_8,buffer);//Read from lower left
+   if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+    {
+
+        int width = 0;
+        int height = 0;
+        glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_WIDTH,&width);
+        glGetRenderbufferParameteriv(GL_RENDERBUFFER,GL_RENDERBUFFER_HEIGHT,&height);
+        unsigned int* buffer = (unsigned int*)malloc(sizeof(unsigned int)*width*height);
+        memset(buffer,0,width*height* sizeof(unsigned int));
+//        if(!renderedTexture->isCreated())
+//        {
+//            renderedTexture->setSize(width,height,0);
+//            renderedTexture->setFormat(QOpenGLTexture::TextureFormat::RGBAFormat);
+//            renderedTexture->create();
+//            renderedTexture->bind();
+//            glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+//            glBindTexture(GL_TEXTURE_2D,0);
+//        }
+//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    glBindTexture(GL_TEXTURE_2D,renderedTexture);
+
+        glTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_WIDTH,&width);
+        glTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_HEIGHT,&height);
+        int w,h;
+        glGetTexParameteriv(GL_TEXTURE_2D,GL_TEXTURE_WIDTH,&w);
+        int err = glGetError();
+     glBindTexture(GL_TEXTURE_2D,renderTexId);
+    glGetTexImage(GL_TEXTURE_2D,0,GL_RGBA,GL_UNSIGNED_INT_8_8_8_8,buffer);
 
     QImage* image = new QImage(width,height,QImage::Format_RGBA8888);
     for(int i = 0;i<width;i++)
@@ -752,7 +668,15 @@ void OglWidget::updateParent() {
             color.setAlpha((rgba&0x000000ff));
             image->setPixelColor(i,j,color);
         }
-    emit displayChanged(image);
+//       QPainter painter;
+//       painter.begin(this);
+//       painter.drawImage(this->rect(),*image);
+//       painter.end();
+//       emit displayChanged(renderedTexture);
+       emit displayChanged(renderTexId,width,height);
+//       emit displayChanged(image);
+//            emit displayChanged(renderedTexture->textureId());
+    }
 }
 
 void OglWidget::releaseMesh() {

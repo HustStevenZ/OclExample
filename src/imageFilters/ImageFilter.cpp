@@ -7,15 +7,20 @@
 #include <iostream>
 #include "ImageFilter.h"
 
-ImageFilter::ImageFilter() {
-}
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#endif
 //////////////////////////
 // 3*3 Filter
 //[ * * * ]
 //[ * * * ] * 1/factorsum
 //[ * * * ]
 ////////////////////////
-std::string imageFilterKernel="\n"
+std::string imageFilterKernel="/*********\n"
+        "*\n"
+        "*Author: Sanqian Zhao\n"
+        "**********/\n"
+        "\n"
         "__constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;\n"
         "\n"
         "__kernel void image_filter( __read_only image2d_t input, __write_only image2d_t output,__global float* filter) {\n"
@@ -70,6 +75,21 @@ std::string imageFilterKernel="\n"
         "      uint4 prightdown = read_imageui(input,sampler,rightDownCord);\n"
         "\n"
         "\n"
+        "            if(get_image_channel_data_type(input) == CLK_UNORM_INT8)\n"
+        "            {\n"
+        "               pixel = convert_uint4(read_imagef(input,sampler,coord)*255);\n"
+        "               pleftup = convert_uint4(read_imagef(input,sampler,leftupCord)*255);\n"
+        "               pup = convert_uint4(read_imagef(input,sampler,upCord)*255);\n"
+        "               prightup = convert_uint4(read_imagef(input,sampler,rightupCord)*255);\n"
+        "               pleft = convert_uint4(read_imagef(input,sampler,leftCord)*255);\n"
+        "               pright = convert_uint4(read_imagef(input,sampler,rightCord)*255);\n"
+        "               pleftdown = convert_uint4(read_imagef(input,sampler,leftDowCord)*255);\n"
+        "               pdown = convert_uint4(read_imagef(input,sampler,downCord)*255);\n"
+        "               prightdown = convert_uint4(read_imagef(input,sampler,rightDownCord)*255);\n"
+        "\n"
+        "            }\n"
+        "\n"
+        "\n"
         "       uint4 resultpixelf =convert_uint4((convert_float4(pleftup)*filter[0]+convert_float4(pup)*filter[1]+convert_float4(prightup)*filter[2]+\n"
         "                           convert_float4(pleft)*filter[3]+convert_float4(pixel)*filter[4]+convert_float4(pright)*filter[5]+\n"
         "                           convert_float4(pleftdown)*filter[6]+convert_float4(pdown)*filter[7]+convert_float4(prightdown)*filter[8]));\n"
@@ -77,6 +97,12 @@ std::string imageFilterKernel="\n"
         "      write_imageui(output,coord,resultpixelf);\n"
         "    }";
 
+ImageFilter::ImageFilter() {
+
+    _program = _context->createProgramFromSource(imageFilterKernel);
+
+    _kernel = _program->createKernel("image_filter");
+}
 QImage* ImageFilter::blurImage(QImage *image)  {
 
     float filter[9]={
@@ -100,14 +126,99 @@ QImage* ImageFilter::embossingImage(QImage *image) {
                      0.0f,0.5f,1.0f};
     return filterImage3x3(image,filter);
 }
+QImage* ImageFilter::blurImage(GLuint textureObj,int width,int height) {
+
+    float filter[9]={
+            1.0/16.0,2.0/16.0,1.0/16.0,
+            2.0f/16.0, 4.0f/16.0,2.0f/16.0,
+            1.0f/16.0,2.0f/16.0,1.0f/16.0};
+    return filterImage3x3(textureObj,filter,width,height);
+}
+QImage* ImageFilter::embossingImage(GLuint textureObj,int width,int height) {
+
+    float filter[9]={-1.0f,-0.5f,-0.0f,
+                     -0.5f,0.5f,0.5f,
+                     0.0f,0.5f,1.0f};
+    return filterImage3x3(textureObj,filter,width,height);
+}
+
+QImage* ImageFilter::sharpingImage(GLuint textureObj,int width,int height) {
+    float filter[9]={-1.0,-1.0,-1.0,
+                     -1.0,9.0,-1.0,
+                     -1.0,-1.0,-1.0};
+    return filterImage3x3(textureObj,filter,width,height);
+}
+QImage* ImageFilter::filterImage3x3(GLuint textureObj, const float *filter,int width,int height) {
+    OclKernel* oclKernel=_kernel;
+    cl_image_format rgb_format;
+    rgb_format.image_channel_order = CL_RGBA;
+    rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
+
+    int w = width;
+    int h = height;
+    OclImage *inputBuffer = _context->createImage2DFromGLTex(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,0,textureObj);
+    if(inputBuffer== nullptr)
+        return nullptr;
+    int ifsize;
+//    clGetImageInfo(inputBuffer->getClBuffer(),CL_IMAGE_FORMAT, sizeof(cl_image_format),&rgb_format,NULL);
+    OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,w,h,w*4,NULL);
+
+    OclBuffer *filterBuffer = _context->createBuffer(9*sizeof(float),OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,NULL);
+
+
+    _context->enqueueWriteBuffer(filterBuffer,0,9*sizeof(float),(char*)(filter));
+
+    oclKernel->setKernelArgBuffer(0,inputBuffer);
+    oclKernel->setKernelArgBuffer(1,outputBuffer);
+    oclKernel->setKernelArgBuffer(2,filterBuffer);
+
+    size_t local_w = 16;
+    size_t local_h = 16;
+    size_t work_size[]= {((size_t)w/local_w)*local_w,((size_t)h/local_h)*local_h};
+    size_t local_size[]={local_w,local_h};
+    size_t offset_size[]={work_size[0]%local_w,work_size[1]%local_h};
+    _context->enqueueKernel(oclKernel,2,offset_size,work_size,local_size);
+
+    _context->flush();
+    unsigned int* buffer = new unsigned int[w*h];
+
+    _context->enqueueReadImage2D(outputBuffer,w,h,(char*)buffer);
+//    _context->enqueueReadImage2D(inputBuffer,w,h,(char*)buffer);
+    QSize imageSize(w,h);
+//    if(rgb_format.image_channel_data_type==CL_RGBA
+//            && rgb_format.image_channel_data_type == CL_UNORM_INT8)
+    QImage *resultImage = new QImage(imageSize,QImage::Format_RGBX8888);
+//    QRgb *imageData = new QRgb[image->width()*image->height()];
+    for(int i = 0;i<w;i++)
+    {
+        for(int j=0;j<h;j++)
+        {
+            int index = w*j+i;
+            int alpha=((*(buffer+index))&0xff000000)>>24;
+            int blue=((*(buffer+index))&0x00ff0000)>>16;
+            int green=((*(buffer+index))&0x0000ff00)>>8;
+            int red=((*(buffer+index))&0x000000ff);
+//            *(imageData+index)=qRgba(red,green,blue,alpha);
+            resultImage->setPixel(i,j,qRgba(red,green,blue,alpha));
+            //resultImage->setColor(index,qRgba(red,green,blue,alpha));
+        }
+    }
+
+    delete inputBuffer;
+//    delete outputBuffer;
+//    delete filterBuffer;
+//    delete data;
+    delete buffer;
+
+    return resultImage;
+
+}
 QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
 
 
 //    clSource source("cl/imageFilters/programes/imageFilter.cl");
 
-    OclProgram *oclProgram = _context->createProgramFromSource(imageFilterKernel);
-
-    OclKernel *oclKernel = oclProgram->createKernel("image_filter");
+    OclKernel* oclKernel=_kernel;
     cl_image_format rgb_format;
     rgb_format.image_channel_order = CL_RGBA;
     rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
@@ -172,8 +283,6 @@ QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
     delete inputBuffer;
     delete outputBuffer;
     delete filterBuffer;
-    delete oclKernel;
-    delete oclProgram;
     delete data;
     delete buffer;
 
@@ -204,4 +313,85 @@ std::string ImageFilter::testHelloWorld() {
     return std::string(buffer);
 
 
+}
+
+QImage* ImageFilter::blurImage(QOpenGLTexture *textureObj) {
+
+    float filter[9]={
+            1.0/16.0,2.0/16.0,1.0/16.0,
+            2.0f/16.0, 4.0f/16.0,2.0f/16.0,
+            1.0f/16.0,2.0f/16.0,1.0f/16.0};
+    return filterImage3x3(textureObj,filter);
+}
+
+QImage* ImageFilter::sharpingImage(QOpenGLTexture *textureObj) {
+
+}
+
+QImage* ImageFilter::embossingImage(QOpenGLTexture *textureObj) {
+
+}
+QImage* ImageFilter::filterImage3x3(QOpenGLTexture *textureObj, const float *filter) {
+    OclKernel* oclKernel=_kernel;
+    cl_image_format rgb_format;
+    rgb_format.image_channel_order = CL_RGBA;
+    rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
+
+    int w, h;
+    int miplevel = 0;
+
+    w = textureObj->width();
+    h = textureObj->height();
+//    glBindTexture(GL_TEXTURE_2D,textureObj);
+    int err=CL_FALSE;
+    OclImage *inputBuffer = _context->createImage2DFromGLTex(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,0,textureObj->textureId());
+    if(inputBuffer== nullptr)
+        return nullptr;
+    OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,w,h,w*4,NULL);
+
+    OclBuffer *filterBuffer = _context->createBuffer(9*sizeof(float),OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,NULL);
+
+
+    _context->enqueueWriteBuffer(filterBuffer,0,9*sizeof(float),(char*)(filter));
+
+    oclKernel->setKernelArgBuffer(0,inputBuffer);
+    oclKernel->setKernelArgBuffer(1,outputBuffer);
+    oclKernel->setKernelArgBuffer(2,filterBuffer);
+
+    size_t local_w = 16;
+    size_t local_h = 16;
+    size_t work_size[]= {((size_t)w/local_w)*local_w,((size_t)h/local_h)*local_h};
+    size_t local_size[]={local_w,local_h};
+    size_t offset_size[]={work_size[0]%local_w,work_size[1]%local_h};
+    _context->enqueueKernel(oclKernel,2,offset_size,work_size,local_size);
+
+    _context->flush();
+    unsigned int* buffer = new unsigned int[w*h];
+
+//    _context->enqueueReadImage2D(outputBuffer,w,h,(char*)buffer);
+    QSize imageSize(w,h);
+    QImage *resultImage = new QImage(imageSize,QImage::Format_RGBX8888);
+//    QRgb *imageData = new QRgb[image->width()*image->height()];
+    for(int i = 0;i<w;i++)
+    {
+        for(int j=0;j<h;j++)
+        {
+            int index = w*j+i;
+            int red=((*(buffer+index))&0xff000000)>>24;
+            int green=((*(buffer+index))&0x00ff0000)>>16;
+            int blue=((*(buffer+index))&0x0000ff00)>>8;
+            int alpha=((*(buffer+index))&0x000000ff);
+//            *(imageData+index)=qRgba(red,green,blue,alpha);
+            resultImage->setPixel(i,j,qRgba(red,green,blue,alpha));
+            //resultImage->setColor(index,qRgba(red,green,blue,alpha));
+        }
+    }
+
+    delete inputBuffer;
+    delete outputBuffer;
+    delete filterBuffer;
+//    delete data;
+    delete buffer;
+
+    return resultImage;
 }
