@@ -222,6 +222,7 @@ QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
     cl_image_format rgb_format;
     rgb_format.image_channel_order = CL_RGBA;
     rgb_format.image_channel_data_type = CL_UNSIGNED_INT8;
+    cl_event profileevent;
 
     OclImage *inputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_READ_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
     OclImage *outputBuffer =_context->createImage2D(OclBuffer::BufferMode::OCL_BUFFER_WRITE_ONLY,&rgb_format,image->width(),image->size().height(),image->width()*4,NULL);
@@ -256,7 +257,8 @@ QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
     size_t work_size[]= {((size_t)image->width()/local_w)*local_w,((size_t)image->height()/local_h)*local_h};
     size_t local_size[]={local_w,local_h};
     size_t offset_size[]={work_size[0]%local_w,work_size[1]%local_h};
-    _context->enqueueKernel(oclKernel,2,offset_size,work_size,local_size);
+//    clEnqueueNDRangeKernel(_context->get_command_queue(),oclKernel->getClKernel(),2,offset_size,work_size,local_size,0,NULL,&profileevent);
+    _context->enqueueKernel(oclKernel,2,offset_size,work_size,local_size,profileevent);
 
     _context->flush();
     unsigned int* buffer = new unsigned int[image->width()*image->height()];
@@ -280,6 +282,12 @@ QImage* ImageFilter::filterImage3x3(QImage *image, const float *filter){
         }
     }
 
+    cl_int start,end;
+    size_t return_size;
+    clGetEventProfilingInfo(profileevent,CL_PROFILING_COMMAND_START, sizeof(cl_int),&start,&return_size);
+    clGetEventProfilingInfo(profileevent,CL_PROFILING_COMMAND_END, sizeof(cl_int),&end,&return_size);
+
+    std::cout<<"kernel finished in "<< end-start<< "ns"<<std::endl;
     delete inputBuffer;
     delete outputBuffer;
     delete filterBuffer;

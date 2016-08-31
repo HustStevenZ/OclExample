@@ -36,6 +36,7 @@ public:
                             size_t depth, size_t row_pitch, size_t slice_pitch, void *data);
 
     void enqueueKernel(OclKernel* kernel,unsigned int work_dimension,size_t * work_offset,size_t * work_size,size_t * local_size);
+    void enqueueKernel(OclKernel* kernel,unsigned int work_dimension,size_t * work_offset,size_t * work_size,size_t * local_size,cl_event& profilingevent);
 
     void enqueueReadBuffer(OclBuffer* buffer, unsigned int offset, unsigned int size,char* hostMem);
 

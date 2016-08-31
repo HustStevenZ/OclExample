@@ -20,7 +20,7 @@ OclContext::OclContext(cl_context context) {
     _devices = new cl_device_id[_num_devices];
     clGetContextInfo(_context,CL_CONTEXT_DEVICES, sizeof(cl_device_id)*_num_devices,_devices,NULL);
 
-    _command_queue = clCreateCommandQueue(_context,_devices[0],0,&errCode);
+    _command_queue = clCreateCommandQueue(_context,_devices[0],CL_QUEUE_PROFILING_ENABLE,&errCode);
 }
 
 OclProgram* OclContext::createProgramFromSource(std::string sourceStr) {
@@ -74,6 +74,13 @@ void OclContext::enqueueKernel(OclKernel *kernel,unsigned int work_dimension, si
 
 }
 
+void OclContext::enqueueKernel(OclKernel *kernel, unsigned int work_dimension, size_t *work_offset, size_t *work_size,
+                               size_t *local_size, cl_event& profilingevent) {
+    cl_int errCode = clEnqueueNDRangeKernel(_command_queue,kernel->getClKernel(),work_dimension,work_offset,work_size,local_size,0,NULL,&profilingevent);
+
+    OclErrors::CheckError(errCode,"OclContext::enqueueKernel");
+
+}
 void OclContext::enqueueReadBuffer(OclBuffer *buffer, unsigned int offset, unsigned int size, char *hostMem) {
     cl_int errCode = clEnqueueReadBuffer(_command_queue,buffer->getClBuffer(),CL_TRUE,offset,size,(void*)hostMem,0,NULL,NULL);
     OclErrors::CheckError(errCode,"OclContext::enqueueReadBuffer");
