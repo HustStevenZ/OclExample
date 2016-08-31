@@ -8,6 +8,9 @@
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #endif
+#ifdef __linux__
+#include <GL/gl.h>
+#endif
 OclContext::OclContext(cl_context context) {
     _context=context;
 

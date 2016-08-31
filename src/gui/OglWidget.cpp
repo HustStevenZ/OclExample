@@ -8,10 +8,33 @@
 #include <iostream>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #include <QPainter>
+#endif
 
+#ifdef __linux__
+#include <GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+
+void *GetAnyGLFuncAddress(const char *name)
+{
+  void *p = (void *)glXGetProcAddress((const GLubyte*)name);
+  return p;
+}
+
+typedef void (APIENTRYP PFNGLFRAMEBUFFERTEXTUREPROC) (GLenum target, GLenum attachment, GLuint texture, GLint level);
+
+
+typedef void (APIENTRYP PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint *arrays);
+
+
+typedef void (APIENTRYP PFNGLBINDVERTEXARRAYPROC) (GLuint array);
+PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)GetAnyGLFuncAddress("glFramebufferTexture");
+PFNGLGENVERTEXARRAYSPROC glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)GetAnyGLFuncAddress("glGenVertexArrays");
+PFNGLBINDVERTEXARRAYPROC glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)GetAnyGLFuncAddress("glBindVertexArray");
 #endif
 OglWidget::OglWidget(QWidget *parent)
         : QOpenGLWidget(parent),
@@ -666,7 +689,7 @@ void OglWidget::updateParent() {
             color.setGreen((rgba&0x00ff0000)>>16);
             color.setBlue((rgba&0x0000ff00)>>8);
             color.setAlpha((rgba&0x000000ff));
-            image->setPixelColor(i,j,color);
+            image->setPixel(i,j,color.rgb());
         }
 //       QPainter painter;
 //       painter.begin(this);

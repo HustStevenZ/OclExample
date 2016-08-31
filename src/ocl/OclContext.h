@@ -10,6 +10,9 @@
 #include "OclProgram.h"
 #include "OclBuffer.h"
 #include "OclImage.h"
+#ifdef __linux__
+#include <GL/gl.h>
+#endif
 
 class OclEngine;
 

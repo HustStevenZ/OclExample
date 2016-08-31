@@ -19,7 +19,7 @@ OglExampleWidget::OglExampleWidget(QWidget *parant) {
     menuBar->setNativeMenuBar(false);
     mainlayout->setMenuBar(menuBar);
     QMenu* fileMenu = menuBar->addMenu(tr("File"));
-    QAction* fileOp = new QAction("open");
+    QAction* fileOp = new QAction("open",fileMenu);
     fileMenu->addAction(fileOp);
     connect(fileOp,&QAction::triggered,this,&OglExampleWidget::openMesh);
 

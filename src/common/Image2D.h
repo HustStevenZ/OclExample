@@ -5,7 +5,12 @@
 #ifndef OCLEXAMPLE_IMAGE_H
 #define OCLEXAMPLE_IMAGE_H
 
+#ifdef __APPLE__
 #include <OpenCL/opencl.h>
+#endif
+#ifdef __linux__
+#include <CL/cl.h>
+#endif
 #include <src/ocl/OclImage.h>
 #include "Color.h"
 

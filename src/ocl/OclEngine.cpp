@@ -6,6 +6,9 @@
 #include "OclErrors.h"
 #include <vector>
 #include <algorithm>
+#ifdef __linux__
+#include <GL/glx.h>
+#endif
 
 /***
  * Construction for OclEngine
